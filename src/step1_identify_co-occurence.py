@@ -32,9 +32,11 @@ def validate_and_fix_geometry(geometry):
 def process_fire(fire, insects):
     results = []
     try:
-        intersected = False
+        # Filter out rows where the insect year is greater than the fire year
+        filtered_insects = insects[insects['Year'] <= fire['Fire_Year']]
+        
 
-        for i, insects_row in insects.iterrows():
+        for i, insects_row in filtered_insects.iterrows():
             insect_geometry = validate_and_fix_geometry(insects_row.geometry)
             if insect_geometry is None:
                 logging.error(f"Invalid geometry for insect_id {insects_row['Insect_ID']}")
@@ -42,16 +44,11 @@ def process_fire(fire, insects):
 
             if fire.geometry.intersects(insect_geometry):
                 results.append({'Fire_ID': fire['Fire_ID'], 
-                                'Year': insects_row['Year'],
+                                'Insect_Year': insects_row['Year'],
+                                'Fire_Year': fire['Fire_Year'],
                                 'defoliated': 'defoliated',
                                 'geometry': fire.geometry})
-                intersected = True
 
-        if not intersected:
-            results.append({'Fire_ID': fire['Fire_ID'], 
-                            'Year': 'NA',
-                            'defoliated': 'non-defoliated',
-                            'geometry': fire.geometry})
 
     except Exception as e:
         logging.error(f"Error processing fire_id {fire['Fire_ID']}: {e}")
@@ -87,10 +84,7 @@ if __name__ == "__main__":
     # Fires
     fires_filtered = gpd.GeoDataFrame(fires_filtered)
 
-    # Randomly select 30 fires
-    # TODO: Remove this line later, it's temporary for testing purposes
-    if len(fires_filtered) > 10:
-        fires_filtered = fires_filtered.sample(n=30, random_state=1)
+    
 
     # Load the insects shapefile and ensure the same CRS
     insects = gpd.read_file(insect_path)
@@ -104,6 +98,6 @@ if __name__ == "__main__":
 
     # Save the GeoDataFrame to a file
     final_shp_out_path = Path(out_path)
-    overlap_out_path = str(final_shp_out_path / "qc_fire_overlap_cases.shp")
+    overlap_out_path = str(final_shp_out_path / "qc_co-occurences_1986-2012.shp")
     result_gdf.to_file(overlap_out_path)
 
