@@ -2,6 +2,7 @@ import ee
 import pandas as pd
 import geemap
 from datetime import date
+import os 
 
 # Initialize Earth Engine
 ee.Initialize()
@@ -146,7 +147,7 @@ def run_landtrendr_for_fires(fire_ids, fires, folder="chapter3_lt_nbr_v2", scale
         indices = preNBR.addBands(postNBR)
         
         # calculate burn severity metrics
-        burnIndices = calcBS(indices, ft)
+        burnIndices = calcBS(indices, fire_feature)
         
         # add nbr bands 
         nbrBands = nbr2.addBands(nbr3)
