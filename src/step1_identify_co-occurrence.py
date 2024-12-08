@@ -36,6 +36,23 @@ def fire_overlap_cases(fire, insects):
     fire_year = int(fire['Fire_Year'].values[0])
     fire_id = fire['Fire_ID'].values[0]
 
+    # check if column is year
+    if 'Year' not in insects.columns:
+    # Check if there is a column named 'year' and rename it to 'Year'
+        if 'year' in insects.columns:
+            insects = insects.rename(columns={'year': 'Year'})
+            print("Column 'year' has been renamed to 'Year'.")
+        else:
+            print("Neither 'Year' nor 'year' column found.")
+    else:
+        print("Column 'Year' already exists.")
+
+    
+    # Convert Year column to int if it's not already
+    if insects['Year'].dtype != 'int64':
+        insects['Year'] = insects['Year'].astype(int)
+        print("Column 'Year' has been converted to int.")
+   
     # Filter insect year
     sbw = insects[insects['Year'] <= fire_year]
 
@@ -93,7 +110,7 @@ def fire_overlap_cases(fire, insects):
 def iterate_fires(fire, insect):
     results =[]
 
-    fire = fire[(fire['Fire_Year'] >= '1985') & (fire['Fire_Year'] <= '2012')]
+    fire = fire[(fire['Fire_Year'] >= 1985) & (fire['Fire_Year'] <= 2012)]
 
     # Ensure 'Fire_Year' column exists before filtering
     if 'Fire_Year' not in fire.columns:
@@ -104,7 +121,7 @@ def iterate_fires(fire, insect):
 
 
     # Change the CRS of gdf to match the CRS of insect
-    insect = gdf2.to_crs(fire.crs)
+    insect = insect.to_crs(fire.crs)
 
 
     for i, fire_row in fire.iterrows():
@@ -146,5 +163,5 @@ if __name__ == '__main__':
 
     # Save the GeoDataFrame to a file
     final_shp_out_path = Path(out_path)
-    overlap_out_path = str(final_shp_out_path / "on_co-occurrences_1986-2012_v2.csv")
+    overlap_out_path = str(final_shp_out_path / "on_co-occurrences_1986-2012.csv")
     final_df.to_csv(overlap_out_path, index=False)
