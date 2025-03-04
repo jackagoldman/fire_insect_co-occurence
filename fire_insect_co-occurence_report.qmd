@@ -1,0 +1,809 @@
+---
+title: "fire_insect_co-occurence_report"
+format: html
+editor: visual
+tbl-cap-location: top
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+```{r intialize packages, echo=FALSE}
+#| echo: false
+#| message: false
+#| warning: false
+
+library(tidyverse)
+library(DAPSm)
+library(ggplot2)
+library(sf)
+library(rnaturalearth)
+library(rnaturalearthdata)
+library(viridis)
+library(cowplot)
+library(MatchIt)
+
+
+
+
+```
+
+```{r required data, echo=FALSE}
+
+#| echo: false
+#| message: false
+#| warning: false
+
+
+### prep data
+# read in
+history = read.csv("/home/goldma34/fire_insect_co-occurence/data/outputs/on/on_defoliation_history_wx.csv")
+
+history <- history %>% 
+  rename("host_pct" = "host_percentage")
+
+# read in centroids
+centroids <- read.csv("/home/goldma34/fire_insect_co-occurence/data/outputs/on/on_fire_centroids.csv")
+
+# join fire centroids to history
+history <- history %>% 
+  left_join(centroids, by = "Fire_ID")
+
+
+history_gt90 <- history %>% 
+  filter(!(Max_Overlap_Percent <= 90 & history ==1 ))
+
+#
+h90.sf <- st_as_sf(history_gt90, coords = c("x", "y"), crs = 4326)
+
+#sbw history
+sbw <- read.csv("/home/goldma34/fire_insect_co-occurence/data/sbw-defol-data-v2.csv")
+
+# clean history
+history_gt90 <- history_gt90 %>% 
+  left_join(sbw, by = "Fire_ID") %>% 
+  select(-c(Time_Since_Defoliation, Cumulative_Years, defol)) %>% 
+  rename(Time_Since_Defol = tsd) %>% 
+  rename(Cumulative_Years_Defol = years_defol)
+
+# set windows of opp
+history_gt90 <- history_gt90 %>% 
+  mutate(window_opp = case_when(Time_Since_Defol >=1 & 
+                                  Time_Since_Defol <= 2 & history ==1 ~ "1",
+                                Time_Since_Defol >=3 & Time_Since_Defol<= 9 ~"2",
+                                Time_Since_Defol >= 10 ~ "3",
+                                
+                                TRUE ~ "0"))
+
+
+#Splitting the data for subclass
+# keep non-defoliated options
+hist_gt90_1 <- subset(history_gt90, window_opp == "0" | window_opp == "1")
+hist_gt90_2  <- subset(history_gt90, window_opp == "0" | window_opp == "2")
+hist_gt90_3 <- subset(history_gt90, window_opp == "0" | window_opp == "3")
+
+
+
+
+```
+
+```{r, model, results='hide'}
+
+#| warning: false
+#| message: false
+#| echo: false
+
+
+
+# Full matching on a probit PS
+m.out2 <- matchit(history ~  host_pct +isi_90 + dc_90+ dmc_90 + ffmc_90 + bui_90 + fwi_90,
+                  data = history_gt90,
+                  method = "nearest",
+                  distance = "glm",
+                  link = "probit",
+                  m.order = "random",
+                 ### set a maximum distance for the matches
+                 caliper = 0.10)
+
+
+
+m.data <- match_data(m.out2)
+
+
+m.data %>% 
+  group_by(history) %>% 
+  summarise("Number of Fires" = n()) %>% 
+  mutate(history = case_when(history ==1 ~ "Defoliated",
+                           history ==0 ~"Non-Defoliated"))
+
+# Convert the data frame to an sf object
+m.data.sf <- st_as_sf(m.data, coords = c("x", "y"), crs = 4326)
+```
+
+# Overview
+
+## Background
+
+Fire severity is a measure of biomass and soil change used to gauge how intensely an ecosystem was impact by fire (Lentile et al 2013). A number of studies have hypothesized about the potential impact that spatial legacies of SBW defoliation may have on wildfires. While there is evidence that supports insect-induced changes in vegetation structure prior to wildfire (Watt et al 2018, 2020), the causality between these changes and wildfire impacts such as changes in severity remain uncertain. This is because trying to establish how SBW legacies impact fire severity causally requires a control observation to compare outcomes, and since most studies rely on historical defoliation and wildfire observational data. Identifying a control group is difficult as factors that influence fire outcomes include slope, vegetation type, or vegetation moisture. Therefore, establishing a control observation requires identifying statistically similar controls that burned under similar conditions. Fortunately, pre-processing methods such as propensity score matching are an established method for identifying such quasi-experimental controls in wildfire studies (Bustic, Woo x2 etc). Using pre-processed datasets, analysis such as linear regression can be used to predict treatment effect on fire severity.
+
+In observational studies, propensity score matching (PSM) is a common statistical technique applied to create a control group that is comparable in confounding variables to a treatment group in studies where treatments are unable to be randomly assigned. For each observation a propensity score (PS) is calculated which reflects the probability of receiving the treatment based on observed characteristics (i.e., potential confounders). Using PS researchers can match participants from the treatment group with those from the control group based on the similarity between scores. The degree of similarity can be selected by researchers. Referred to as the caliper, it is suggested that the degree of similar is within +/- 0.3. By simulating the conditions of a randomized controlled trial, the process of PS matching helps to balance the groups on observed characteristics, thereby reducing bias and allowing for a more accurate estimate of the treatment's impact. Using the balanced dataset, researchers are able to provide a more robust and reliable estimate of the treatment's effect.
+
+In this study, we aim to reduce the uncertainty surrounding the impacts of spatial legacies of SBW defoliation on wildfire in Ontario's boreal shield. We applied PSM to create a balanced control-treatment experimental design with observation data on wildfire-defoliation co-occurrences. We identified wildfires-defoliation co-occurrences between 1985-2012 using aerial-survey defoliation data and remotely sensed wildfire data. For each area, we quantified median burn severity and mean recovery magnitude. Spectral recovery trajectories were used to estimate post-fire recovery, as recent research shows they are effective and accurate at capturing post-fire structural recovery patterns in North American boreal forests (Smith‐Tripp et al 2024). Using these data, we estimated the average treatment effect (ATT) of defoliation on wildfire outcomes.
+
+## Question
+
+How does defoliation influence **(a) burn severity** and **(b) recovery magnitude**
+
+Furthermore, we examine whether the average treatment effect is different at the three separate time periods after SBW defoliation outlined by Fleming et al. (2002)
+
+## Methods
+
+### Study area
+
+We focused our analysis on the boreal shield ecozone of Ontario (65,336,847 ha) @fig-study-area-2. There is a climatic gradient across this region, with colder and drier conditions in the west and more precipitation to the east (Girardin and Mudelsee 2008). The area is predominantly covered by black spruce (picea mariana) and balsam fir (abies balsamea).
+
+Spruce budworm outbreaks have frequently erupted across Ontario's boreal shield ecoregion over the past few decades. A severe outbreak occured from 1968 to 1988 where insect activity peaked around 1980. This outbreak was followed by a second, moderate severity outbreak that erupted in 2000s that continued well into into the 2010s (Navarro et al 2018, Berguet et al 2021).
+
+```{r  warning=FALSE, message=FALSE, echo=FALSE}
+
+#| label:study-area-code
+#| warning: false
+#| message: false
+#| echo: false
+
+# Load Ontario map data
+ontario <- ne_states(country = "Canada", returnclass = "sf") %>%
+  filter(name == "Ontario")
+
+
+# Create the inset pie chart for m.data.sf
+inset_data1 <- h90.sf %>%
+  group_by(history) %>%
+  summarise(count = n())
+
+inset_pie1 <- ggplot(inset_data1, aes(x = "", y = count, fill = factor(history))) +
+  geom_bar(stat = "identity", width = 1) +
+  coord_polar("y") +
+  scale_fill_manual(values = c("0" = "#FF8C00A0", "1" = "#8B0000A0"), 
+                    name = NULL, 
+                    labels = c("0" = "Non-Defoliated", "1" = "Defoliated")) +
+  theme_void() +
+  labs(x = NULL, y = NULL) +
+  theme(axis.text = element_blank(),
+        axis.ticks = element_blank(),
+        panel.grid = element_blank(),
+        legend.position = "none") +
+  geom_text(aes(label = count), position = position_stack(vjust = 0.5), size = 3)  # Adjust the size here
+
+# Create the inset pie chart for m.data.sf2
+inset_data2 <- m.data.sf %>%
+  group_by(history) %>%
+  summarise(count = n())
+
+inset_pie2 <- ggplot(inset_data2, aes(x = "", y = count, fill = factor(history))) +
+  geom_bar(stat = "identity", width = 1) +
+  coord_polar("y") +
+  scale_fill_manual(values = c("0" = "#FF8C00A0", "1" = "#8B0000A0"), 
+                    name = NULL, 
+                    labels = c("0" = "Non-Defoliated", "1" = "Defoliated")) +
+  theme_void() +
+  labs(x = NULL, y = NULL) +
+  theme(axis.text = element_blank(),
+        axis.ticks = element_blank(),
+        panel.grid = element_blank(),
+        legend.position = "none") +
+  geom_text(aes(label = count), position = position_stack(vjust = 0.5), size = 3)  # Adjust the size here
+# Create the first map with inset
+map1 <- ggplot() +
+  geom_sf(data = ontario, fill = "navajowhite1", color = "black") +
+  geom_sf(data = h90.sf, aes(color = factor(history)), size = 1) +
+  scale_color_manual(values = c("0" = "#FF8C00A0", "1" = "#8B0000A0"), 
+                     name = NULL, 
+                     labels = c("0" = "Non-Defoliated", "1" = "Defoliated"),
+                     guide = guide_legend(title.position = "top", title.hjust = 0.4)) +
+  theme_void() +
+  theme(
+    plot.title = element_text(hjust = 0, size = 16),
+    legend.position = "right",
+    legend.direction = "horizontal",
+    legend.text = element_text(size = 10)
+  ) +
+  labs(title = "A)") +
+  annotation_custom(ggplotGrob(inset_pie1), xmin = -78, xmax = -73, ymin = 42, ymax = 52)
+
+# Create the second map with inset using m.data.sf2
+map2 <- ggplot() +
+  geom_sf(data = ontario, fill = "navajowhite1", color = "black") +
+  geom_sf(data = m.data.sf, aes(color = factor(history)), size = 1) +
+  scale_color_manual(values = c("0" = "#FF8C00A0", "1" = "#8B0000A0"), 
+                     name = NULL, 
+                     labels = c("0" = "Non-Defoliated", "1" = "Defoliated"),
+                     guide = guide_legend(title.position = "top", title.hjust = 0.4)) +
+  theme_void() +
+  theme(
+    plot.title = element_text(hjust = 0, size = 16),
+    legend.position = "top",
+    legend.direction = "horizontal",
+    legend.text = element_text(size = 10)
+  ) +
+  labs(title = "B)") +
+  annotation_custom(ggplotGrob(inset_pie2), xmin = -78, xmax = -73, ymin = 42, ymax = 52)
+
+
+
+# Extract the legend from one of the maps
+legend <- cowplot::get_legend(map1)
+
+# Combine the legend and the two maps
+combined_plot <- plot_grid(
+  legend,
+  plot_grid(
+    map1 + theme(legend.position = "none"),
+    map2 + theme(legend.position = "none"),
+    ncol = 2,
+    rel_widths = c(1, 1)
+  ),
+  ncol = 1,
+  rel_heights = c(0.1, 1)
+)
+
+
+```
+
+```{r}
+#| fig-cap: Study area fires
+#| label: fig-study-area-2
+#| echo: false
+
+combined_plot
+
+```
+
+### Fire data
+
+We obtained wildfire occurrence and polygon data for the years 1986 to 2012 from the National Burned Area Composite for the boreal shield ecozone of Ontario (Skakun et al 2022). We excluded all fires that were classified as prescribed burns and removed those categorized as reburns -- fires that burned through a previously burnt area - following an existing protocol (Whitman et al 2020). Reburns can exhibit significant variation in burn severity relative to areas without recent history of wildfire (Whitman et al 2019). Fires were removed if the overlap between polygons was greater than the smallest area burned in our dataset (40ha) or if the gap between the fires was equal to or less than 26 years. The 26-year threshold represents the earliest year for which we had fire perimeter data for the first fire in our dataset.
+
+### Spruce budworm data
+
+We obtained defoliation polygons from publicly available forest insect damage events maps produced and distributed by Ontario for the years 1975 to 2012. We filtered each dataset to include only spruce budworm polygons. Each dataset attributed a single defoliation event to an individual polygon, with multiple, independent polygons recorded per year. For each province, we consolidated the data by year into a multipolygon dataset, where each row represented all defoliation events that occurred in a single year from 1975 to 2012. This allowed us to count the number of years a specific area had been defoliated by assessing the overlap of polygons across different years.
+
+### Fire selection
+
+We identified wildfire-insect co-occurrences by identifying fires that burned in defoliated areas. For each fire, we calculated the intersection between the fire polygon and any defoliated polygon for 15 years prior to the year of the fire event. We restricted the time between defoliation events and wildfire occurrence were 15 years because previous evidence suggests that the spatial legacies of defoliation have a negligible impact on wildfire behavior beyond 15 years, with the greatest impact occurring between 3-9 years following defoliation (Fleming et al 2002a, James et al 2017). For every co-occurrence between a wildfire and insect polygon, we generated a polygon of the intersection (referred to hereafter as co-occurence polygon). Using the resulting co-occurrence polygon and the orgginal fire polygon, we calculated the percentage of the fire polygon that was defoliated in each year by dividing the total are of the fire polygon by the co-occurrence polygon area multiplied by 100. Out of all identified co-occurrence years if the percent of maximum overlap was less than 5% we removed that co-occurrence from our dataset due to the coarseness of defoliation polygons inherent to aerial sketch maps. Additionally, we found that there are only 11 fires below 90% overlap between wildfire-insect co-occurrence. We decided to remove all fires where max overlap was below 90%, for a final sample size of 256 defoliated fires @tbl-overlap. In addition to percent overlap, we also quantified time since defoliation and cumulative years defoliation. We quantified the cumulative years a single fire event was defoliated by counting the number of co-occurrence polygons. Time since defoliation was calculated as the difference between the year of the fire event and the last year an intersection co-occurrence was identified. Out of 1,601 total fires that burned between 1986 and 2012, we identified \# total fires that had a history of defoliation.
+
+```{r}
+#| tbl-cap: "Distribution of Percent Overlap between Wildfire-Insect co-occurrence"
+#| label: tbl-overlap
+#| echo: false
+
+# history defol
+history_defol = history %>% 
+  filter(history == 1)
+
+# Define the bin width
+bin_width <- 10
+
+# Create bins and count the number of observations in each bin
+bin_counts <- history_defol %>%
+  mutate(bins = cut(Max_Overlap_Percent, breaks = seq(0, max(Max_Overlap_Percent) + bin_width, by = bin_width), right = FALSE)) %>%
+  count(bins)
+
+bin_counts <- bin_counts %>%
+  mutate(bins = str_replace_all(bins, "[\\[\\]\\(\\),]", "")) %>% 
+   mutate(bins = case_when(
+    nchar(bins) == 3 ~ str_replace(bins, "(\\d)(\\d{2})", "\\1-\\2%"),
+    nchar(bins) == 4 ~ str_replace(bins, "(\\d{2})(\\d{2})", "\\1-\\2%"),
+    nchar(bins) == 5 ~ str_replace(bins, "(\\d{2})(\\d{3})", "\\1-\\2%"),
+    nchar(bins) == 6 ~ "100%",
+    TRUE ~ bins
+  )) %>% 
+  rename("Percent Overlap" = "bins") %>%
+  rename("Number of Fires" = "n")
+
+# View the table
+knitr::kable(bin_counts,  align = "c") %>%
+  kableExtra::kable_styling(position = "center" )
+```
+
+### Burn Severity and recovery magnitude data
+
+The normalized burn ratio (NBR) data used to quantify burn severity and recovery magnitude were derived from the LandTrendr spectral-temporal segmentation algorithm, as detailed by Kennedy et al. (2010). Briefly, LandTrendr (Landsat-based Detection of Trends in Disturbance and Recovery) is designed to reduce noise commonly found in pixel-level analysis by producing a spectral trajectory from Landsat image pixels (Kennedy et al 2010). LandTrendr takes a time series of a spectral index, most commonly NBR or NDVI, and identifies breakpoints between consecutive observations in an otherwise stable time series. Using these breakpoints, LandTrendr creates a new time series where each annual observation is interpolated onto a line of best fit through the observation. This resulting time series focuses on significant, long-term changes in a pixel. Compared to unaltered surface reflectance data, fitted LandTrendr data reduces pixel-level variability caused by climate, atmosphere, phenology, and sun angle. Additionally, the time series produced by LandTrendr allows easy extraction of the magnitude and duration of changes in the spectral index. Fitted LandTrendr data are often used to examine the effects of wildfires on vegetation change (i.e., burn severity) and recovery (Bright et al 2019).
+
+We extracted the fitted NBR data using the Google Earth Engine implementation of LandTrendr (Kennedy et al 2018). For each matched pair (defoliated/non-defoliated portion of the fire event), we assembled a cloud-free Landsat image collection from TM, ELM+ and OLI sensors for all available images between April 31st and October 31st of each year between the year before the fires up to 10 years after the fire year, resulting in a collection of spanning 12 years. Composite images were calculated using a medoid approach for each year in the collection. Medoid compositing selects the most representative pixel in a series that is closest to the median of all pixel values. The result was a single, cloud-free image for each year in the series for each fire. We calculated the NBR from the medoid images and input the time series into the LandTrendr algorithm, resulting in a smoothed NBR times series for each pixel, free of noise.
+
+Using the NBR time series, we calculated percent recovery magnitude and the relativized burn ration (RBR) for each pixel in the series. Recovery magnitude, which is the percent recovery of NBR 10 years after the fire, is calculated by dividing the NBR of the final year in the time series by the difference between the NBR for the year before the fire and the NBR for the year of the fire, multiplied by 100 (Fig S1). The relativized burn ratio (RBR) is a Landsat-based metric that captures changes in forest cover following a fire relative to pre-fire vegetation. RBR is more robust than other Landsat-based measures (e.g., RdNBR) because it is more sensitive to pre-fire values when vegetation cover is low (Parks et al 2014b). RBR is calculated by dividing the dNBR by the pre-fire NBR value (see Supplementary Materials for the equation). In this calculation we also included an offset..
+
+### Climate and fire weather data
+
+To quantify the effect of fire weather on burn severity we used fire weather indices from the Canadian Forest Fire Weather Index (FWI) System (Van Wagner 1987). The FWI system is part of the foundation of Canada's wildfire risk assessment and used operationally by forest managers to effectively predict and evaluate wildfire danger both in Canada and globally. The FWI system is a weather-based system that outputs six indices that are numeric ratings which represent daily fuel moisture and fire behaviour potential. Fine fuel moisture code (FFMC) captures the moisture content of litter fuels. Duff moisture code (DMC) captures the moisture content of loosely compacted organic layers. Drought code (DC) captures the average moisture content of deep organic layers. Initial spread Index (ISI) represents the expected rate of fire spread. Build-up index (BUI) represents the total amount of fuel available to burn. Fire weather index (FWI), which combines ISI and BUI, provides a measure of potential fire intensity. These FWI metrics have been used previously to successfully model wildfire severity in the boreal forest (Whitman et al 2018, San‐Miguel et al 2020, Talucci et al 2022).
+
+Daily fire weather is a strong top-down drive of burn severity (Whitman et al 2018). Because the FWI system represents daily fuel moisture and fire potential, and our measure of burn severity is a single value taken at the end of the fire duration, day-to-day variation over the course of the fire may influence burn severity. To control for this variation in daily fire weather, we calculated the 90th percentile of all indices over the known duration of the fire. This method allows us to capture only extreme FWI events, which have the most influence on wildfire burn severity (Whitman et al 2018). Daily FWI values were interpolated using thin-plate splines to the centroid of each fire perimeter from weather stations across our study region from the day of the year that the fire started burning to the reported fire out date. Because weather station data was only available from 1990 onwards, we focused on fires that burned between 1990.
+
+### Forest Composition
+
+To understand how forest composition affects burn severity and recovery, we analyzed the percentage of each fire-affected area classified as coniferous, broadleaf or mixedwood. We used high-resolution annual forest land cover maps of Canada's forested ecosystems (Hermosilla et al 2022) available in Google Earth Engine. These maps, derived from Landsat time series at a 30-m spatial resolution, represent annual forest land cover. For each year, the maps were created using a best-available-pixel composite image for August 1st and 30th. We calculated the percentage of coniferous, broadleaf or mixedwood areas within the perimeter for each fire-affected area for the year before the fire occurred. We avoided using data from the fire year itself to prevent wildfire events from skewing the estimation of forest composition.
+
+### Statistical matching
+
+Following processing steps outlined above, we identified 807 fires that that burned between 1990 and 2012 prior to matching, consisting of 551 fires without a history of defoliation, and 256 fires with defoliation history (@tbl-ss-nine, @fig-study-area-2 A)). For the purpose of this study, we consider treatment units as fires with a history of defoliation, and control units as those fires without a history of defoliation. In this observational study where assigning randomized treatments was not possible, matching allowed us to reduce bias by creating a sample where confounding factors are balanced between treatment and control units, mimicking a randomized controlled trial matching allows researchers to attribute differences in outcomes more confidently to the treatment rather that confounding variables.
+
+```{r}
+#| tbl-cap: "Sample size of defoliated and non-defoliated fires with a maximum overlap greater than 90%"
+#| label: tbl-ss-nine
+#| message: false
+#| echo: false
+#| warning: false
+
+
+ss2 <- history_gt90 %>% 
+  group_by(history) %>% 
+  summarise("Number of Fires" = n()) %>% 
+  mutate(history = case_when(history ==1 ~ "Defoliated",
+                           history ==0 ~"Non-Defoliated"))
+
+# View the table
+knitr::kable(ss2,  align = "c") %>%
+  kableExtra::kable_styling(position = "center" )
+
+```
+
+We used the MatchIt package in R (Ho et al. 2011) to match the treatment fires (defoliated) with control fires (non-defoliated) with the most similar covariate values. Initially, we conducted propensity score martching (PSM) on the entire dataset. The covariates we matched on in the model were weather, topography, spatial and environmental covariates **(TABLE)**. We estimated propensity scores using a generalized linear model with a probit link function. We used nearest neighbor matching with a caliper of 0.10 to ensure that matched pairs had similar propensity scores. Our target estimate was the average treatment effect in the treated (defoliated) fires (ATT). We estimated propensity scores using a generalized linear model with a probit link function. We used nearest neighbor matching with a caliper of 0.10 to ensure that matched pairs had similar propensity scores. Our target estimate was the average treatment effect in the treated (defoliated) fires (ATT). We assessed covariate balance before and after matching using the love plots of the standardized mean difference (SMD) @fig-asmd, and density plots of all covariates @fig-density-cov using the cobalt package (Greifer, 2023). SMD represents the mean difference between treatment and control units and we considered a threshold of \< 0.25 as an indication of acceptable covariate balance (Stuart et al., 2013). Our final sample sizes after matching were 165 treated and control units respectively @fig-study-area-2 B).
+
+```{r, echo=FALSE}
+#| fig-cap: Comparison of covariate balance using covariate means for treatment and control units before matching (orange) and after matching (red) to assess whether matching has improved balance. Mean values < 0.25 are considered acceptable covariate balance, dotted line represents 0.1. 
+#| label: fig-asmd
+#| echo: false
+
+v <- data.frame(old = c("host_pct", "isi_90", "dc_90", 
+                        "dmc_90", "ffmc_90", "bui_90", "fwi_90"),
+                new = c("Host Species Percentage", "Intial Spread Index", "Drought Code", 
+                        "Duff Moisture Code", "Fine Fuel Moisture Code", "Build Up Index", "Fire Weather Index"))
+
+cobalt::love.plot(m.out2, stats = c("mean.diffs"), 
+          threshold = c(m = .1), 
+          binary = "std",
+          abs = TRUE,
+          var.order = "unadjusted",
+          var.names = v,
+          limits = c(0, 1),
+          grid = FALSE,
+          wrap = 20,
+          sample.names = c("Unmatched", "Matched"),
+          position = "top",
+          shapes = c("circle", "triangle"),
+          colors = c("#FF8C00A0", "#8B0000A0"))
+```
+
+```{r, echo = FALSE, warning=FALSE, message=FALSE}
+
+#| echo = false
+#| warning = false
+#| message = false
+#| label: covariate balance density plot code
+
+host_plot <- cobalt::bal.plot(m.out2, 
+                              var.name = "host_pct", 
+                              which = "both",
+                              colors = c("#FF8C00A0", "#8B0000A0"),
+                              sample.names = c("Unmatched", "Matched")) +scale_fill_manual(
+  values = c("0" = "#FF8C00A0", "1" = "#8B0000A0"),
+  labels = c("0" = "Non-Defoliated", "1" = "Defoliated"))+xlab("Host Species Percentage") + ggtitle(NULL) +theme_bw() + theme(plot.margin = unit(c(1, 1, 1, 1), "cm"))
+
+isi_plot <- cobalt::bal.plot(m.out2, 
+                             var.name = "isi_90", 
+                             which = "both", 
+                              colors = c("#FF8C00A0", "#8B0000A0"),
+                             sample.names = c("Unmatched", "Matched"))+ scale_fill_manual(
+  values = c("0" = "#FF8C00A0", "1" = "#8B0000A0"),
+  labels = c("0" = "Non-Defoliated", "1" = "Defoliated"))+xlab("Initial Spread Index") + ggtitle(NULL) +theme_bw()+ theme(plot.margin = unit(c(1, 1, 1, 1), "cm"))
+
+dc_plot <- cobalt::bal.plot(m.out2, 
+                            var.name = "dc_90", 
+                            which = "both", 
+                              colors = c("#FF8C00A0", "#8B0000A0"),
+                            sample.names = c("Unmatched", "Matched"))+ scale_fill_manual(
+  values = c("0" = "#FF8C00A0", "1" = "#8B0000A0"),
+  labels = c("0" = "Non-Defoliated", "1" = "Defoliated"))+xlab("Drought Code") + ggtitle(NULL) +theme_bw()+ theme(plot.margin = unit(c(1, 1, 1, 1), "cm"))
+
+dmc_plot <- cobalt::bal.plot(m.out2, 
+                             var.name = "dmc_90", 
+                             which = "both", 
+                              colors = c("#FF8C00A0", "#8B0000A0"),
+                             sample.names = c("Unmatched", "Matched"))+ scale_fill_manual(
+  values = c("0" = "#FF8C00A0", "1" = "#8B0000A0"),
+  labels = c("0" = "Non-Defoliated", "1" = "Defoliated"))+xlab("Duff Moisture Code") + ggtitle(NULL) +theme_bw()+ theme(plot.margin = unit(c(1, 1, 1, 1), "cm"))
+
+ffmc_plot <- cobalt::bal.plot(m.out2, 
+                              var.name = "ffmc_90", 
+                              which = "both", 
+                              colors = c("#FF8C00A0", "#8B0000A0"),
+                              sample.names = c("Unmatched", "Matched"))+ scale_fill_manual(
+  values = c("0" = "#FF8C00A0", "1" = "#8B0000A0"),
+  labels = c("0" = "Non-Defoliated", "1" = "Defoliated"))+xlab("Fine Fuel Moisture Code") + ggtitle(NULL) +theme_bw()+ theme(plot.margin = unit(c(1, 1, 1, 1), "cm"))
+
+bui_plot <- cobalt::bal.plot(m.out2, 
+                             var.name = "bui_90", 
+                             which = "both", 
+                              colors = c("#FF8C00A0", "#8B0000A0"),
+                             sample.names = c("Unmatched", "Matched"))+ scale_fill_manual(
+  values = c("0" = "#FF8C00A0", "1" = "#8B0000A0"),
+  labels = c("0" = "Non-Defoliated", "1" = "Defoliated"))+xlab("Build Up Index") + ggtitle(NULL) +theme_bw()+ theme(plot.margin = unit(c(1, 1, 1, 1), "cm"))
+
+fwi_plot <- cobalt::bal.plot(m.out2, 
+                            var.name = "fwi_90", 
+                            which = "both", 
+                              colors = c("#FF8C00A0", "#8B0000A0"),
+                            sample.names = c("Unmatched", "Matched"))+ scale_fill_manual(
+  values = c("0" = "#FF8C00A0", "1" = "#8B0000A0"),
+  labels = c("0" = "Non-Defoliated", "1" = "Defoliated"))+xlab("Fire Weather Index") + ggtitle(NULL) +theme_bw()+ theme(plot.margin = unit(c(1, 1, 1, 1), "cm"))
+
+
+
+```
+
+```{r, echo= FALSE, message = FALSE, warning = FALSE, fig.width=8, fig.height=20}
+
+#| fig-cap: density of covariates across defoliated fire units (orange curves) and a sample of units non-defoliated fire units (red curves).
+#| label: fig-density-cov
+#| warning: false
+#| message: false
+#| echo: false
+
+
+library(cowplot)
+
+# Arrange the plots in a 2-column layout
+plot_grid(host_plot, isi_plot, dc_plot, dmc_plot, ffmc_plot, bui_plot,fwi_plot, ncol = 1, align = 'v', rel_heights = c(1, 1, 1, 1, 1, 1))
+
+```
+
+For the subgroup analysis, prior to matching we subset the defoliated fires into three categories based on the time since defoliation. The categories were defined according to the "window of opportunity" outline by Fleming et al. (2002), who found that wildfire frequency and behaviour was disproportionately higher 3-9 years following defoliation. We subset defoliated fires into the following 3 categories: 0-2 years after defoliation, 3-9 years and greater than 10 years @tbl-ss-subgroup. We compared multiple matching matching methods for each subgroup. The model with the best fit was chosen as the model with the best covariate balance evaluated using SMD \<0.25 for each covariate. Matching was based on both propensity score and Mahalanobis distances without replacement. We tested both nearest neighbour and optimal matching. Propensity scores were estimated using logit and probit link functions and we evaluated three separate calipers (Appendix A). The best model for each subgroup is presented in (TABLE ..)
+
+```{r}
+#| tbl-cap: "Sample size of defoliated and non-defoliated fires with a maximum overlap greater than 90%"
+#| label: tbl-ss-subgroup
+#| message: false
+#| echo: false
+#| warning: false
+
+
+ss_sg1 <- hist_gt90_1 %>% 
+  group_by(history) %>% 
+  summarise("Number of Fires" = n()) %>% 
+  mutate(history = case_when(history ==1 ~ "Defoliated",
+                           history ==0 ~"Non-Defoliated")) %>% 
+  mutate(subgroup = "0-2 years after defoliation") %>% filter(history != "Non-Defoliated") %>% 
+  select(-c(history))
+
+ss_sg2 <- hist_gt90_2 %>% 
+  group_by(history) %>% 
+  summarise("Number of Fires" = n()) %>% 
+  mutate(history = case_when(history ==1 ~ "Defoliated",
+                           history ==0 ~"Non-Defoliated"))%>% 
+  mutate(subgroup = "3-9 years after defoliation")%>% filter(history != "Non-Defoliated") %>% 
+  select(-c(history))
+
+ss_sg3 <- hist_gt90_3 %>% 
+  group_by(history) %>% 
+  summarise("Number of Fires" = n()) %>% 
+  mutate(history = case_when(history ==1 ~ "Defoliated",
+                           history ==0 ~"Non-Defoliated"))%>% 
+  mutate(subgroup = "10+ years after defoliation") %>% filter(history != "Non-Defoliated") %>% 
+  select(-c(history))
+
+ss_sg_nd <-  hist_gt90_3 %>% 
+  group_by(history) %>% 
+  summarise("Number of Fires" = n()) %>% 
+  mutate(history = case_when(history ==1 ~ "Defoliated",
+                           history ==0 ~"Non-Defoliated"))%>% 
+  mutate(subgroup = "Non-Defoliated") %>% filter(history != "Defoliated") %>% 
+  select(-c(history))
+
+ss_sg <- rbind(ss_sg1, ss_sg2, ss_sg3, ss_sg_nd)
+
+# View the table
+knitr::kable(ss_sg,  align = "c") %>%
+  kableExtra::kable_styling(position = "center" )
+
+```
+
+```{r}
+
+#| warning: false
+#| message: false
+#| echo: false
+#| label: Average treatment effect-full mod
+
+fit <- lm(rbr_w_offset  ~ history *(host_pct+ isi_90 + dc_90+ dmc_90 + ffmc_90 + bui_90 + fwi_90),  data = m.data,weights = weights)
+
+fit_att <- as.data.frame(marginaleffects::avg_comparisons(fit,
+                variables = "history",
+                vcov = ~subclass,
+                newdata = subset(history == 1))) %>% 
+  mutate(Fires= "all")
+
+```
+
+#### Subgroup analysis after propensity score matching
+
+make a function that tries a bunch of different matching, with and without replacement
+
+```{r}
+
+#| warning: false
+#| message: false
+#| echo: false
+#| label: subgroup-psm
+
+# tsd 1-2 matching on a probit PS
+m.out_w1 <- matchit(history ~  host_pct +isi_90 + dc_90+ dmc_90 + ffmc_90 + bui_90 + fwi_90,
+                  data = hist_gt90_1,
+                  method = "nearest",
+                  distance = "glm",
+                  link = "logit",
+                  m.order = "random",
+                 ### set a maximum distance for the matches
+                 caliper = 0.2,
+replace = TRUE)
+
+# tsd 1-2 matching on a probit PS
+m.out_w2 <- matchit(history ~  host_pct  + isi_90 + dc_90+ dmc_90 + ffmc_90 + bui_90 + fwi_90,
+                  data = hist_gt90_2,
+                  method = "nearest",
+                  distance = "glm",
+                  link = "logit",
+                  m.order = "random",
+                 ### set a maximum distance for the matches
+                 caliper = 0.2
+                 #mahvars = ~host_pct +isi_90 + dc_90+ dmc_90 + ffmc_90 + bui_90 + fwi_90,
+)
+
+# tsd 1-2 matching on a probit PS
+m.out_w3 <- matchit(history ~  host_pct +  isi_90 + dc_90+ dmc_90 + ffmc_90 + bui_90 + fwi_90,
+                  data = hist_gt90_3,
+                  distance = "glm",
+                  m.order = "random",
+                  caliper = .2,
+                  mahvars = ~host_pct +isi_90 + dc_90+ dmc_90 + ffmc_90 + bui_90 + fwi_90
+                  )
+m.out_w3
+```
+
+```{r}
+# Set parameters:
+methods <- c("nearest", "optimal")
+distances <- c("glm", "mahalanobis")
+links <- c("logit", "probit")
+m_orders <- c("random")
+calipers <- c(0.1, 0.2, 0.3)
+replace_list <- c(FALSE)
+use_mahvars_list <- c(FALSE, TRUE)
+
+```
+
+```{r}
+
+#| warning: false
+#| message: false
+#| echo: false
+#| label: subgroup-matched-data-tsd1
+
+best_model_info <- find_best_model(hist_gt90_1, methods, distances, links, m_orders, calipers, replace_list, use_mahvars_list)
+best_model_1 <- best_model_info$best_model
+all_results <- best_model_info$results
+
+m.data.w1 <- match_data(best_model_1)
+
+
+m.data.w1 %>% 
+  group_by(history) %>% 
+  summarise("Number of Fires" = n()) %>% 
+  mutate(history = case_when(history ==1 ~ "Defoliated",
+                           history ==0 ~"Non-Defoliated"))
+
+```
+
+```{r}
+#| warning: false
+#| message: false
+#| echo: false
+#| label: subgroup-matched-data-tsd2
+
+best_model_info <- find_best_model(hist_gt90_2, methods, distances, links, m_orders, calipers, replace_list, use_mahvars_list)
+best_model_2 <- best_model_info$best_model
+all_results <- best_model_info$results
+
+m.data.w2 <- match_data(best_model_2)
+
+
+m.data.w2 %>% 
+  group_by(history) %>% 
+  summarise("Number of Fires" = n()) %>% 
+  mutate(history = case_when(history ==1 ~ "Defoliated",
+                           history ==0 ~"Non-Defoliated"))
+
+
+```
+
+```{r}
+#| warning: false
+#| message: false
+#| echo: false
+#| label: subgroup-matched-data-tsd3
+
+best_model_info <- find_best_model(hist_gt90_3, methods, distances, links, m_orders, calipers, replace_list, use_mahvars_list)
+best_model_3 <- best_model_info$best_model
+all_results <- best_model_info$results
+
+
+
+m.data.w3 <- match_data(best_model_3)
+
+
+m.data.w3 %>% 
+  group_by(history) %>% 
+  summarise("Number of Fires" = n()) %>% 
+  mutate(history = case_when(history ==1 ~ "Defoliated",
+                           history ==0 ~"Non-Defoliated"))
+
+
+```
+
+```{r}
+
+#| warning: false
+#| message: false
+#| echo: false
+#| label: subgroup-fit1
+
+fit.w1 <- lm(rbr_w_offset  ~ history *(host_pct+ isi_90 + dc_90+ dmc_90 + ffmc_90 + bui_90 + fwi_90),  data = m.data.w1,weights = weights)
+
+fit.w1_att <- as.data.frame(marginaleffects::avg_comparisons(fit.w1,
+                variables = "history",
+                vcov = ~subclass,
+                newdata = subset(history == 1)))%>% 
+  mutate(Fires= "0-2 years after defoliation")
+```
+
+```{r}
+
+#| warning: false
+#| message: false
+#| echo: false
+#| label: subgroup-fit2
+
+
+fit.w2 <- lm(rbr_w_offset  ~ history *(host_pct+ isi_90 + dc_90+ dmc_90 + ffmc_90 + bui_90 + fwi_90),  data = m.data.w2,weights = weights)
+
+fit.w2_att <- as.data.frame(marginaleffects::avg_comparisons(fit.w2,
+                variables = "history",
+                vcov = ~subclass,
+                newdata = subset(history == 1))) %>% 
+  mutate(Fires= "3-9 years after defoliation")
+```
+
+```{r}
+
+#| warning: false
+#| message: false
+#| echo: false
+#| label: subgroup-fit3
+
+fit.w3 <- lm(rbr_w_offset  ~ history *(host_pct+ isi_90 + dc_90+ dmc_90 + ffmc_90 + bui_90 + fwi_90),  data = m.data.w3,weights = weights)
+
+fit.w3_att <- as.data.frame(marginaleffects::avg_comparisons(fit.w3,
+                variables = "history",
+                vcov = ~subclass,
+                newdata = subset(history == 1))) %>% 
+  mutate(Fires= "10+ years after defoliation")
+```
+
+```{r}
+
+#| warning: false
+#| message: false
+#| echo: false
+#| label: subgroup-plot
+#| fig-cap: Average treatment effect (ATT) estimates and their lower (2.5%) and upper (97.5%) confidence intervals for the effects of defoliation for entire dataset (all) and across all levels of time since defoliation.
+
+att_comparison <- rbind(fit_att, fit.w1_att, fit.w2_att, fit.w3_att)
+
+# Specify the desired order of the x-axis values
+desired_order <- c("all", "0-2 years after defoliation", "3-9 years after defoliation", "10+ years after defoliation")  # Replace with your actual values
+
+# Convert the fires column to a factor with the specified order
+att_comparison$Fires <- factor(att_comparison$Fires, levels = desired_order)
+
+
+ggplot(att_comparison, aes(x = Fires, y = estimate)) +
+    geom_errorbar(aes(ymin = conf.low, ymax = conf.high), width = 0.5, colour = "#8B0000A0") +
+  geom_point(color="#8B0000A0", size = 4) +
+  labs(x = "Data Subgroup", y = "Average Treatment Estimate (RBR)") +
+  theme_classic()+
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+  
+  
+  
+```
+
+```{r}
+#| echo: false
+#| label: tbl-sugroup-best-model
+method <- best_model_1$info$method
+distance <- best_model_1$info$distance
+link <- best_model_1$info$link
+
+extract_best_model_params(best_model_1)
+
+```
+
+#### Host species percentage
+
+Now lets look at the distribution of host species percentage with this subset of data
+
+```{r}
+#| tbl-cap: "Distribution of Host Species Percentage between Wildfire-Insect co-occurrence"
+#| label: tbl-host-species-percentage
+#| tbl-colwidths: [60,40]
+#| echo: false
+
+# history defol
+history_defol = history_gt90 %>% 
+  filter(history == 1)
+# history non_defol 
+history_non = history_gt90 %>% 
+  filter(history == 0)
+
+# Define the bin width
+bin_width <- 10
+
+# defoliation
+# Create bins and count the number of observations in each bin
+bin_counts_defol <- history_defol %>%
+  mutate(bins = cut(host_pct, breaks = seq(0, max(host_pct) + bin_width, by = bin_width), right = FALSE)) %>%
+  count(bins)
+
+bin_counts_defol <- bin_counts_defol %>%
+  mutate(bins = str_replace_all(bins, "[\\[\\]\\(\\),]", "")) %>% 
+   mutate(bins = case_when(
+    nchar(bins) == 3 ~ str_replace(bins, "(\\d)(\\d{2})", "\\1-\\2%"),
+    nchar(bins) == 4 ~ str_replace(bins, "(\\d{2})(\\d{2})", "\\1-\\2%"),
+    nchar(bins) == 5 ~ str_replace(bins, "(\\d{2})(\\d{3})", "\\1-\\2%"),
+    nchar(bins) == 6 ~ "100%",
+    TRUE ~ bins
+  )) %>% 
+  rename("Host Percent" = "bins") %>%
+  rename("Defoliated Fires" = "n")
+
+
+# non-defoliated
+# Create bins and count the number of observations in each bin
+bin_counts_non <- history_non %>%
+  mutate(bins = cut(host_pct, breaks = seq(0, max(host_pct) + bin_width, by = bin_width), right = FALSE)) %>%
+  count(bins)
+
+bin_counts_non <- bin_counts_non %>%
+  mutate(bins = str_replace_all(bins, "[\\[\\]\\(\\),]", "")) %>% 
+   mutate(bins = case_when(
+    nchar(bins) == 3 ~ str_replace(bins, "(\\d)(\\d{2})", "\\1-\\2%"),
+    nchar(bins) == 4 ~ str_replace(bins, "(\\d{2})(\\d{2})", "\\1-\\2%"),
+    nchar(bins) == 5 ~ str_replace(bins, "(\\d{2})(\\d{3})", "\\1-\\2%"),
+    nchar(bins) == 6 ~ "100%",
+    TRUE ~ bins
+  )) %>% 
+  rename("Host Percent" = "bins") %>%
+  rename("Non-Defoliated Fires" = "n")
+
+# merge the two together
+host_spp_pct = bin_counts_defol %>% 
+  left_join(bin_counts_non, by= c("Host Percent"))
+
+# View the table
+knitr::kable(host_spp_pct,  align = "c") %>%
+  kableExtra::kable_styling(position = "center" )
+```
+
+For non-defoliated fires, there are only single digit non-defoliated for host percent before 50. In the following analysis we will look at the distribution of fires for each bin
+
+# 
