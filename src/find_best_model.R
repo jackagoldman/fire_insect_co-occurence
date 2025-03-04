@@ -106,35 +106,83 @@ find_best_model <- function(data, methods, distances, links, m_orders, calipers,
 }
 
 
-#
-extract_best_model_params <- function(best_model) {
-  params <- list(
-    method = best_model$method,
-    distance = best_model$distance,
-    link = best_model$link,
-    m_order = best_model$m.order,
-    caliper = best_model$caliper,
-    replace = best_model$replace,
-    mahvars = if (!is.null(best_model$mahvars)) deparse(best_model$mahvars) else NA
-  )
+#' Extract Parameters from Best Models
+#'
+#' This function extracts parameters from up to three best models and combines them into a single data frame. 
+#' It also includes a subgrouping string and a time series descriptor (TSD) extracted from the model names.
+#'
+#' @param best_model_1 A list representing the first best model.
+#' @param best_model_2 A list representing the second best model.
+#' @param best_model_3 A list representing the third best model.
+#' @param subgrouping A string representing the subgrouping information.
+#' @return A data frame containing the extracted parameters from the best models, including the subgrouping and TSD.
+#' @examples
+#' best_model_1 <- list(info = list(method = "nearest", mahalanobis = "TRUE", distance = "glm", link = "logit"), caliper = 0.2)
+#' best_model_2 <- list(info = list(method = "optimal", mahalanobis = "FALSE", distance = "mahalanobis", link = "probit"), caliper = 0.3)
+#' best_model_3 <- list(info = list(method = "full", mahalanobis = "TRUE", distance = "glm", link = "logit"), caliper = 0.1)
+#' subgrouping <- "Group A"
+#' extract_best_model_params(best_model_1, best_model_2, best_model_3)
+extract_best_model_params <- function(best_model_1, best_model_2, best_model_3) {
   
-  # Replace NULL values with NA
-  params <- lapply(params, function(x) {
-    if (is.null(x)) {
-      x <- NA
+  # Helper function to extract the suffix and remove it from the name
+  extract_suffix <- function(model_name) {
+    parts <- strsplit(model_name, "_")[[1]]
+    suffix <- tail(parts, 1)
+    base_name <- paste(head(parts, -1), collapse = "_")
+    return(list(base_name = base_name, suffix = suffix))
+  }
+  
+  # Extract suffixes and update best_model arguments
+  best_model_1_info <- extract_suffix(deparse(substitute(best_model_1)))
+  best_model_2_info <- extract_suffix(deparse(substitute(best_model_2)))
+  best_model_3_info <- extract_suffix(deparse(substitute(best_model_3)))
+  
+  best_model_1$subgroup <- best_model_1_info$suffix
+  best_model_2$subgroup <- best_model_2_info$suffix
+  best_model_3$subgroup <- best_model_3_info$suffix
+  
+  # Combine the three best models into a list
+  best_models <- list(best_model_1, best_model_2, best_model_3)
+
+  # Function to extract parameters from a single model
+  extract_params <- function(model) {
+    if (!is.list(model) || !is.list(model$info)) {
+      stop("Each best_model must be a list with an 'info' element that is also a list.")
     }
-    return(x)
-  })
+    
+    params <- list(
+      Subgroup = if(model$subgroup == 1) "0-2 years after defoliation" else if(model$subgroup == 2) "3-9 years after defoliation" else "10+ years after defoliation",
+      Method = if (model$info$method == "nearest") "1:1 nearest neighbor matching without replacement" else model$info$method,
+      Matching = if (model$info$mahalanobis == "TRUE" & model$info$distance == "mahalanobis") "Mahalanobis" else if (model$info$mahalanobis == "TRUE" & model$info$distance == "glm") "Mahalanobis distance for matching and a propensity score caliper to ensure close matches" else "Propensity Score",
+      Distance = if (model$info$distance == "glm") "estimated with logistic regression (glm)" else if (model$info$distance == "mahalanobis") "estimated with mahalanobis distances" else model$info$distance,
+      Link = model$info$link,
+      Caliper = model$caliper
+    )
+    
+    # Replace NULL values with NA
+    params <- lapply(params, function(x) {
+      if (is.null(x)) {
+        x <- NA
+      }
+      return(x)
+    })
+    
+    # Ensure all elements have the same length
+    max_length <- max(sapply(params, length))
+    params <- lapply(params, function(x) {
+      if (length(x) < max_length) {
+        x <- rep(x, length.out = max_length)
+      }
+      return(x)
+    })
+    
+    params_df <- as.data.frame(params, stringsAsFactors = FALSE)
+    return(params_df)
+  }
   
-  # Ensure all elements have the same length
-  max_length <- max(sapply(params, length))
-  params <- lapply(params, function(x) {
-    if (length(x) < max_length) {
-      x <- rep(x, length.out = max_length)
-    }
-    return(x)
-  })
+  # Extract parameters for each model and combine into a single data frame
+  params_list <- lapply(best_models, extract_params)
+  combined_params_df <- do.call(rbind, params_list)
   
-  params_df <- as.data.frame(params, stringsAsFactors = FALSE)
-  return(params_df)
+  return(combined_params_df)
 }
