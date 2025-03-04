@@ -203,13 +203,13 @@ ul.task-list li input[type="checkbox"] {
 </div>
 </div>
 </div>
-<p>We used the MatchIt package in R (Ho et al.&nbsp;2011) to match the treatment fires (defoliated) with control fires (non-defoliated) with the most similar covariate values. Initially, we conducted propensity score martching (PSM) on the entire dataset. The covariates we matched on in the model were weather, topography, spatial and environmental covariates <strong>(TABLE)</strong>. We estimated propensity scores using a generalized linear model with a probit link function. We used nearest neighbor matching with a caliper of 0.10 to ensure that matched pairs had similar propensity scores. Our target estimate was the average treatment effect in the treated (defoliated) fires (ATT). We estimated propensity scores using a generalized linear model with a probit link function. We used nearest neighbor matching with a caliper of 0.10 to ensure that matched pairs had similar propensity scores. Our target estimate was the average treatment effect in the treated (defoliated) fires (ATT). We assessed covariate balance before and after matching using the love plots of the standardized mean difference (SMD) <a href="#fig-asmd">Figure&nbsp;2</a>, and density plots of all covariates <strong>?@fig-density-cov</strong> using the cobalt package (Greifer, 2023). For SMD, we considered a threshold of &lt; 0.25 as an indication of acceptable covariate balance (Schleicher et al., 2020; Stuart et al., 2013). Our final sample sizes after matching were 165 treated and control units respectively <a href="#fig-study-area-2">Figure&nbsp;1</a> B).</p>
+<p>We used the MatchIt package in R (Ho et al.&nbsp;2011) to match the treatment fires (defoliated) with control fires (non-defoliated) with the most similar covariate values. Initially, we conducted propensity score martching (PSM) on the entire dataset. The covariates we matched on in the model were weather, topography, spatial and environmental covariates <strong>(TABLE)</strong>. We estimated propensity scores using a generalized linear model with a probit link function. We used nearest neighbor matching with a caliper of 0.10 to ensure that matched pairs had similar propensity scores. Our target estimate was the average treatment effect in the treated (defoliated) fires (ATT). We estimated propensity scores using a generalized linear model with a probit link function. We used nearest neighbor matching with a caliper of 0.10 to ensure that matched pairs had similar propensity scores. Our target estimate was the average treatment effect in the treated (defoliated) fires (ATT). We assessed covariate balance before and after matching using the love plots of the standardized mean difference (SMD) <a href="#fig-asmd">Figure&nbsp;2</a>, and density plots of all covariates <strong>?@fig-density-cov</strong> using the cobalt package (Greifer, 2023). SMD represents the mean difference between treatment and control units and we considered a threshold of &lt; 0.25 as an indication of acceptable covariate balance (Stuart et al., 2013). Our final sample sizes after matching were 165 treated and control units respectively <a href="#fig-study-area-2">Figure&nbsp;1</a> B).</p>
 <div class="cell">
 <div class="cell-output-display">
 <div id="fig-asmd" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="fire_insect_co-occurence_report_files/figure-html/fig-asmd-1.png" class="img-fluid figure-img" width="672"></p>
-<p></p><figcaption class="figure-caption">Figure&nbsp;2: Comparison of covariate balance using covariate means for treatment and control units before matching (orange) and after matching (red) to assess whether matching has improved balance.</figcaption><p></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;2: Comparison of covariate balance using covariate means for treatment and control units before matching (orange) and after matching (red) to assess whether matching has improved balance. Mean values &lt; 0.25 are considered acceptable covariate balance, dotted line represents 0.1.</figcaption><p></p>
 </figure>
 </div>
 </div>
@@ -222,7 +222,7 @@ ul.task-list li input[type="checkbox"] {
 <p><img src="fire_insect_co-occurence_report_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid" width="768"></p>
 </div>
 </div>
-<p>For the subgroup analysis, prior to matching we subset the defoliated fires into three categories based on the time since defoliation. The categories were defined according to the “window of opportunity” outline by Fleming et al.&nbsp;(2002), who found that wildfire frequency and behaviour was disproportionately higher 3-9 years following defoliation. We subset defoliated fires into the following 3 categories: 0-2 years after defoliation, 3-9 years and greater than 10 years <a href="#tbl-ss-subgroup">Table&nbsp;3</a>.</p>
+<p>For the subgroup analysis, prior to matching we subset the defoliated fires into three categories based on the time since defoliation. The categories were defined according to the “window of opportunity” outline by Fleming et al.&nbsp;(2002), who found that wildfire frequency and behaviour was disproportionately higher 3-9 years following defoliation. We subset defoliated fires into the following 3 categories: 0-2 years after defoliation, 3-9 years and greater than 10 years <a href="#tbl-ss-subgroup">Table&nbsp;3</a>. We compared multiple matching matching methods for each subgroup. The model with the best fit was chosen as the model with the best covariate balance evaluated using SMD &lt;0.25 for each covariate (Stuart et al.&nbsp;2013). We evaluated matching on propensity score and/or Mahalanobis distances without replacement. Propensity scores were estimated using both nearest neighbour and optimal matching with either logit or probit link functions and we evaluated three separate calipers (Appendix A). The best model for each subgroup is presented in <strong>?@tbl-sugroup-best-model</strong>.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div id="tbl-ss-subgroup" class="anchored">
@@ -262,30 +262,101 @@ ul.task-list li input[type="checkbox"] {
 </div>
 <section id="subgroup-analysis-after-propensity-score-matching" class="level4">
 <h4 class="anchored" data-anchor-id="subgroup-analysis-after-propensity-score-matching">Subgroup analysis after propensity score matching</h4>
+<p>make a function that tries a bunch of different matching, with and without replacement</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>A `matchit` object
+ - method: 1:1 nearest neighbor matching without replacement
+ - distance: Mahalanobis [matching]
+             Propensity score [caliper]
+
+             - estimated with logistic regression
+ - caliper: &lt;distance&gt; (0.048)
+ - number of obs.: 699 (original), 200 (matched)
+ - target estimand: ATT
+ - covariates: host_pct, isi_90, dc_90, dmc_90, ffmc_90, bui_90, fwi_90</code></pre>
+</div>
+</div>
 <div class="cell">
 
 </div>
 <div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 2 × 2
-  history        `Number of Fires`
-  &lt;chr&gt;                      &lt;int&gt;
-1 Non-Defoliated                89
-2 Defoliated                    89</code></pre>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: The arguments `caliper` and `m.order` are not used with `method =
+"optimal"` and will be ignored.
+The arguments `caliper` and `m.order` are not used with `method =
+"optimal"` and will be ignored.
+The arguments `caliper` and `m.order` are not used with `method =
+"optimal"` and will be ignored.
+The arguments `caliper` and `m.order` are not used with `method =
+"optimal"` and will be ignored.
+The arguments `caliper` and `m.order` are not used with `method =
+"optimal"` and will be ignored.
+The arguments `caliper` and `m.order` are not used with `method =
+"optimal"` and will be ignored.
+The arguments `caliper` and `m.order` are not used with `method =
+"optimal"` and will be ignored.
+The arguments `caliper` and `m.order` are not used with `method =
+"optimal"` and will be ignored.
+The arguments `caliper` and `m.order` are not used with `method =
+"optimal"` and will be ignored.
+The arguments `caliper` and `m.order` are not used with `method =
+"optimal"` and will be ignored.
+The arguments `caliper` and `m.order` are not used with `method =
+"optimal"` and will be ignored.
+The arguments `caliper` and `m.order` are not used with `method =
+"optimal"` and will be ignored.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: The argument `m.order` is not used with `method = "optimal"` and will
+be ignored.
+The argument `m.order` is not used with `method = "optimal"` and will
+be ignored.
+The argument `m.order` is not used with `method = "optimal"` and will
+be ignored.
+The argument `m.order` is not used with `method = "optimal"` and will
+be ignored.
+The argument `m.order` is not used with `method = "optimal"` and will
+be ignored.
+The argument `m.order` is not used with `method = "optimal"` and will
+be ignored.
+The argument `m.order` is not used with `method = "optimal"` and will
+be ignored.
+The argument `m.order` is not used with `method = "optimal"` and will
+be ignored.
+The argument `m.order` is not used with `method = "optimal"` and will
+be ignored.
+The argument `m.order` is not used with `method = "optimal"` and will
+be ignored.
+The argument `m.order` is not used with `method = "optimal"` and will
+be ignored.
+The argument `m.order` is not used with `method = "optimal"` and will
+be ignored.</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 2 × 2
   history        `Number of Fires`
   &lt;chr&gt;                      &lt;int&gt;
-1 Non-Defoliated                82
-2 Defoliated                    82</code></pre>
+1 Non-Defoliated                94
+2 Defoliated                    94</code></pre>
 </div>
+</div>
+<div class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 2 × 2
   history        `Number of Fires`
   &lt;chr&gt;                      &lt;int&gt;
-1 Non-Defoliated                97
-2 Defoliated                    97</code></pre>
+1 Non-Defoliated               105
+2 Defoliated                   105</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 2
+  history        `Number of Fires`
+  &lt;chr&gt;                      &lt;int&gt;
+1 Non-Defoliated               149
+2 Defoliated                   149</code></pre>
 </div>
 </div>
 <div class="cell">
@@ -299,7 +370,28 @@ ul.task-list li input[type="checkbox"] {
 </div>
 <div class="cell">
 <div class="cell-output-display">
-<p><img src="fire_insect_co-occurence_report_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid" width="672"></p>
+<p><img src="fire_insect_co-occurence_report_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div id="tbl-sugroup-best-model" class="cell tbl-parent quarto-layout-panel anchored" data-tbl-cap="Matching parameters for subgroup models chosen based on best covariate balance of all covariates with SMD <0.25.">
+<div class="panel-caption table-caption">
+<p><strong>?(caption)</strong></p>
+</div>
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="cell-output cell-output-stdout quarto-layout-cell" style="flex-basis: 100.0%;justify-content: center;">
+<pre><code>                     Subgroup                                            Method
+1 0-2 years after defoliation 1:1 nearest neighbor matching without replacement
+2 3-9 years after defoliation 1:1 nearest neighbor matching without replacement
+3 10+ years after defoliation 1:1 nearest neighbor matching without replacement
+                                                                                  Matching
+1 Mahalanobis distance for matching and a propensity score caliper to ensure close matches
+2                                                                              Mahalanobis
+3                                                                              Mahalanobis
+                                  Distance  Link    Caliper
+1 estimated with logistic regression (glm) logit 0.03893007
+2     estimated with mahalanobis distances  &lt;NA&gt;         NA
+3     estimated with mahalanobis distances  &lt;NA&gt;         NA</code></pre>
+</div>
 </div>
 </div>
 </section>

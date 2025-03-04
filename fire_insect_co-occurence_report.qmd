@@ -23,6 +23,7 @@ library(rnaturalearthdata)
 library(viridis)
 library(cowplot)
 library(MatchIt)
+source("src/find_best_model.R")
 
 
 
@@ -458,7 +459,7 @@ plot_grid(host_plot, isi_plot, dc_plot, dmc_plot, ffmc_plot, bui_plot,fwi_plot, 
 
 ```
 
-For the subgroup analysis, prior to matching we subset the defoliated fires into three categories based on the time since defoliation. The categories were defined according to the "window of opportunity" outline by Fleming et al. (2002), who found that wildfire frequency and behaviour was disproportionately higher 3-9 years following defoliation. We subset defoliated fires into the following 3 categories: 0-2 years after defoliation, 3-9 years and greater than 10 years @tbl-ss-subgroup. We compared multiple matching matching methods for each subgroup. The model with the best fit was chosen as the model with the best covariate balance evaluated using SMD \<0.25 for each covariate. Matching was based on both propensity score and Mahalanobis distances without replacement. We tested both nearest neighbour and optimal matching. Propensity scores were estimated using logit and probit link functions and we evaluated three separate calipers (Appendix A). The best model for each subgroup is presented in (TABLE ..)
+For the subgroup analysis, prior to matching we subset the defoliated fires into three categories based on the time since defoliation. The categories were defined according to the "window of opportunity" outline by Fleming et al. (2002), who found that wildfire frequency and behaviour was disproportionately higher 3-9 years following defoliation. We subset defoliated fires into the following 3 categories: 0-2 years after defoliation, 3-9 years and greater than 10 years @tbl-ss-subgroup. We compared multiple matching matching methods for each subgroup. The model with the best fit was chosen as the model with the best covariate balance evaluated using SMD \<0.25 for each covariate (Stuart et al. 2013). We evaluated matching on propensity score and/or Mahalanobis distances without replacement. Propensity scores were estimated using both nearest neighbour and optimal matching with either logit or probit link functions and we evaluated three separate calipers (Appendix A). The best model for each subgroup is presented in @tbl-sugroup-best-model.
 
 ```{r}
 #| tbl-cap: "Sample size of defoliated and non-defoliated fires with a maximum overlap greater than 90%"
@@ -730,11 +731,9 @@ ggplot(att_comparison, aes(x = Fires, y = estimate)) +
 ```{r}
 #| echo: false
 #| label: tbl-sugroup-best-model
-method <- best_model_1$info$method
-distance <- best_model_1$info$distance
-link <- best_model_1$info$link
+#| tbl-cap: Matching parameters for subgroup models chosen based on best covariate balance of all covariates with SMD <0.25.
 
-extract_best_model_params(best_model_1)
+extract_best_model_params(best_model_1, best_model_2, best_model_3)
 
 ```
 
