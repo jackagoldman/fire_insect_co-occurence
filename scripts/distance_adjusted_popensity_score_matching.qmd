@@ -1,0 +1,386 @@
+---
+title: "distance_based_psm"
+format: html
+editor: visual
+---
+
+# Distance-based propensity score matching workflow
+
+```{r, intialize packages}
+
+library(tidyverse)
+library(DAPSm)
+library(ggplot2)
+
+
+
+
+```
+
+Read in required dataframes
+
+```{r}
+
+history = read.csv("/home/goldma34/fire_insect_co-occurence/data/outputs/on/on_defoliation_history_wx_host_gt50_xy.csv")
+```
+
+## DAPSM
+
+Inspect data
+
+```{r}
+head(history)
+colnames(history)
+```
+
+Look at covariate balance
+
+```{r}
+plot_density_by_group <- function(data, group_col) {
+  # Ensure the group column is a factor
+  data[[group_col]] <- as.factor(data[[group_col]])
+  
+  # Loop through each column in the dataset
+  for (i in seq_along(data)) {
+    # Skip the group column
+    if (names(data)[i] == group_col) next
+    
+    # Create the plot
+    p <- ggplot(data, aes_string(x = names(data)[i], fill = group_col)) +
+      geom_density(alpha = 0.5) +
+      labs(title = paste("Distribution of", names(data)[i], "by", group_col),
+           x = names(data)[i],
+           y = "Density") +
+      theme_minimal()
+    
+    # Print the plot
+    print(p)
+  }
+}
+
+plot_density_by_group(history, "history")
+
+```
+
+Plot a map of the x and y coordinates
+
+Rename host_percentage to shorter name for plotting
+
+```{r}
+history <- history %>% 
+  rename("host_pct" = "host_percentage")
+```
+
+```{r}
+history$prop.scores <- glm(history ~ host_pct + isi_90 + dc_90+ dmc_90 + ffmc_90 + bui_90 + fwi_90,  family = binomial,
+                            data = history)$fitted.values
+```
+
+```{r}
+bal <- CalcDAPSWeightBalance(history, weights = seq(0, 1, length.out = 40),out.col = 4,
+                             cov.cols = c(8, 14, 15, 16, 17, 18, 19), trt.col = 2,
+                             coords.columns = c(21, 22), caliper = 0.3, caliper_type = 'DAPS',
+                             matching_algorithm = 'greedy')
+```
+
+```{r}
+plot_wb <- PlotWeightBalance2(bal$balance, weights = seq(0, 1, length.out = 40), cutoff = 0.21)
+
+
+
+
+```
+
+Optimal weight
+
+```{r}
+DAPS <- DAPSchoiceModel(history, trt.col = 2, out.col = 4, balance = bal$balance,
+                        cutoff = 0.21, pairs = bal$pairs,
+                        weights = seq(0, 1, length.out = 40))
+
+DAPS
+```
+
+```{r}
+MatchedDataMap(x = bal$full_pairs[[10]], trt_coords = c(3, 4),
+               con_coords = c(7, 8))
+```
+
+```{r}
+CE <- DAPSWeightCE(dataset = history, trt.col = 2, out.col = 4, 
+                   weights = seq(0, 1, length.out = 40), pairs = bal$pairs,
+                   chosen_w = DAPS$weight)
+CE$plot
+```
+
+```{r}
+bal$pairs[[38]]
+```
+
+Previous workflow identifies the optimal weight which is
+
+     0.9487179
+
+Now lets run dapest
+
+```{r}
+daps <- DAPSest(history, out.col = 4, trt.col = 2, caliper = 0.3,
+                weight = 0.9487179, coords.columns = c(21,22),
+                pairsRet = TRUE, cov.cols = c(8,  14, 15, 16, 17, 18, 19, 20), cutoff = 0.21,
+                coord_dist = TRUE, caliper_type = 'DAPS',
+                matching_algorithm = 'greedy', true_value = TRUE)
+```
+
+```{r}
+pairs = data.frame(daps$pairs)
+colnames(pairs) <- gsub("\\.", "_", colnames(pairs))
+colnames(pairs)
+```
+
+## Explore DAPSM results
+
+```{r}
+head(pairs)
+```
+
+plot the distribution of propensity scores
+
+```{r}
+ggplot(df_long, aes(x = value, colour = variable)) +
+          geom_freqpoly(bins=10)
+```
+
+```{r}
+df_pairs2 <- reshape2::melt(pairs, measure.vars = c("Trt_Y", "Con_Y")) %>% mutate(variable = case_when(variable == "Trt_Y" ~ "Defoliated",
+    variable == "Con_Y" ~ "Non Defoliated"
+  ))
+
+# calculate the average value 
+mean_defoliated <- df_pairs2 %>%
+  filter(variable == "Defoliated") %>%
+  summarise(mean_value = mean(value, na.rm = TRUE)) %>% mutate(variable = "Defoliated")
+
+mean_nondefoliated <- df_pairs2 %>%
+  filter(variable == "Non Defoliated") %>%
+  summarise(mean_value = mean(value, na.rm = TRUE))%>% mutate(variable = "Non Defoliated")
+
+means = rbind(mean_defoliated, mean_nondefoliated) %>% rename(value = mean_value)
+
+# Plot the boxplot
+ggplot(df_pairs2, aes(x = variable, y = value, fill = variable)) +
+  geom_boxplot() +
+   geom_text(data = means, aes(label= round(value,2)), nudge_y = 20)+
+  labs(title = "Boxplot of Burn Severity for defoliated and non-defoliated pairs",
+       x = "Deoliated vs. Non-defoliated",
+       y = "RBR_w_offset") +
+  theme_minimal()
+```
+
+```{r}
+daps$weight
+```
+
+# MatchIt with nearest neighbour
+
+```{r}
+library(MatchIt)
+library(marginaleffects)
+```
+
+```{r}
+colnames(history)
+```
+
+check initial imbalance
+
+```{r}
+m.out0 <- matchit(history ~ host_pct + isi_90 + dc_90+ dmc_90 + ffmc_90 + bui_90 + fwi_90,
+                  data = history,
+                  method = NULL,
+                  distance = "glm")
+
+```
+
+Check balance before matching
+
+```{r}
+summary(m.out0)
+
+```
+
+Match
+
+```{r}
+# 1:1 NN PS matching w/o replacement
+m.out1 <- matchit(history ~ host_pct + isi_90 + dc_90+ dmc_90 + ffmc_90 + bui_90 + fwi_90,
+                  data = history,
+                  method = "nearest",
+                  distance = "glm")
+```
+
+```{r}
+m.out1
+```
+
+check balance after NN matchings
+
+```{r}
+summary(m.out1, un = FALSE)
+
+```
+
+```{r}
+plot(m.out1, type = "density", interactive = FALSE,
+     which.xs = ~host_pct  + isi_90 + dc_90+ dmc_90 + ffmc_90 + bui_90 + fwi_90)
+
+
+```
+
+Full match
+
+```{r}
+# Full matching on a probit PS
+m.out2 <- matchit(history ~ host_pct + x+ y +isi_90 + dc_90+ dmc_90 + ffmc_90 + bui_90 + fwi_90,
+                  data = history_gt90,
+                  method = "nearest",
+                  distance = "glm", 
+                  mahvars = ~host_pct +x + y +isi_90 + dc_90+ dmc_90 + ffmc_90 + bui_90 + fwi_90)
+m.out2
+```
+
+```{r}
+test2 <- summary(m.out2, un = FALSE)
+
+as.data.frame(test2$sum.matched)
+```
+
+```{r}
+plot(summary(m.out2))
+
+```
+
+estimating treatment effect
+
+```{r}
+m.data <- match_data(m.out2)
+
+head(m.data) 
+
+m.data %>% 
+  group_by(history) %>% 
+  summarise("Number of Fires" = n()) %>% 
+  mutate(history = case_when(history ==1 ~ "Defoliated",
+                           history ==0 ~"Non-Defoliated"))
+```
+
+```{r}
+
+
+fit <- lm(rbr_w_offset  ~ history *(host_pct + x + y+ isi_90 + dc_90+ dmc_90 + ffmc_90 + bui_90 + fwi_90),  data = m.data,weights = weights)
+
+avg_comparisons(fit,
+                variables = "history",
+                vcov = ~subclass,
+                newdata = subset(history == 1))
+```
+
+```{r}
+library(spdep)
+# Extract residuals
+residuals <- residuals(fit)
+
+coords <- cbind(m.data$x, m.data$y)
+
+# Create a spatial weights matrix
+nb <- knn2nb(knearneigh(coords, k = 20))
+listw <- nb2listw(nb, style = "W")
+
+# Calculate Moran's I for the residuals
+moran.test(residuals, listw, randomisation = TRUE)
+```
+
+sensitivity analysis
+
+-   x axis % of defoliation
+
+-   y1 = estimate
+
+-   y2 = sample size
+
+-   Error
+
+Draft of the analysis 28th
+
+-   chat March 14th - discuss analysis
+
+## distribution of max percent overlap
+
+```{r}
+# history defol
+history_defol = history %>% 
+  filter(history == 1)
+
+# Define the bin width
+bin_width <- 10
+
+# Create bins and count the number of observations in each bin
+bin_counts <- history_defol %>%
+  mutate(bins = cut(Max_Overlap_Percent, breaks = seq(0, max(Max_Overlap_Percent) + bin_width, by = bin_width), right = FALSE)) %>%
+  count(bins)
+
+# View the table
+print(bin_counts)
+```
+
+## 
+
+```{r}
+# Load Ontario map data
+ontario <- ne_states(country = "Canada", returnclass = "sf") %>%
+  filter(name == "Ontario")
+
+# Create the main map
+main_map <- ggplot() +
+  geom_sf(data = ontario, fill = "burlywood3", color = "black") +
+  geom_sf(data = h90.sf, aes(color = factor(history)), size = 1) +
+  scale_color_manual(values = c("0" = "darkorange2", "1" = "darkred"), 
+                     name = NULL, 
+                     labels = c("0" = "Non-Defoliated", "1" = "Defoliated"),
+                     guide = guide_legend(title.position = "top", title.hjust = 0.4)) +
+  theme_void() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 16),
+    legend.position = "top",
+    legend.direction = "horizontal",
+    
+    legend.text = element_text(size = 10)
+  ) +
+  labs(title = "Pre-Matched Ontario Fires")
+
+# Create the inset pie chart showing the counts
+inset_data <- h90.sf %>%
+  group_by(history) %>%
+  summarise(count = n())
+
+inset_pie <- ggplot(inset_data, aes(x = "", y = count, fill = factor(history))) +
+  geom_bar(stat = "identity", width = 1) +
+  coord_polar("y") +
+  scale_fill_manual(values = c("0" = "darkorange2", "1" = "darkred"), 
+                    name = "History", 
+                    labels = c("0" = "Non-defoliated", "1" = "Defoliated")) +
+  theme_void() +
+  labs(x = NULL, y = NULL) +
+  theme(axis.text = element_blank(),
+        axis.ticks = element_blank(),
+        panel.grid = element_blank(),
+        legend.position = "none") +
+  geom_text(aes(label = count), position = position_stack(vjust = 0.5))
+
+# Combine the main map and the inset pie chart
+combined_plot <- ggdraw() +
+  draw_plot(main_map) +
+  draw_plot(inset_pie, x = 0.55, y = 0.55, width = 0.25, height = 0.25)
+
+# Display the combined plot
+print(combined_plot)
+```
