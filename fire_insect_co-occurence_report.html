@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.269">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>fire_insect_co-occurence_report</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="fire_insect_co-occurence_report_files/libs/clipboard/clipboard.min.js"></script>
+<script src="fire_insect_co-occurence_report_files/libs/quarto-html/quarto.js"></script>
+<script src="fire_insect_co-occurence_report_files/libs/quarto-html/popper.min.js"></script>
+<script src="fire_insect_co-occurence_report_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="fire_insect_co-occurence_report_files/libs/quarto-html/anchor.min.js"></script>
+<link href="fire_insect_co-occurence_report_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="fire_insect_co-occurence_report_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="fire_insect_co-occurence_report_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="fire_insect_co-occurence_report_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="fire_insect_co-occurence_report_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+<script src="fire_insect_co-occurence_report_files/libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="fire_insect_co-occurence_report_files/libs/lightable-0.0.1/lightable.css" rel="stylesheet">
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">fire_insect_co-occurence_report</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<div class="cell">
+
+</div>
+<div class="cell">
+
+</div>
+<div class="cell">
+
+</div>
+<section id="overview" class="level1">
+<h1>Overview</h1>
+<section id="background" class="level2">
+<h2 class="anchored" data-anchor-id="background">Background</h2>
+<p>Fire severity is a measure of biomass and soil change used to gauge how intensely an ecosystem was impact by fire (Lentile et al 2013). A number of studies have hypothesized about the potential impact that spatial legacies of SBW defoliation may have on wildfires. While there is evidence that supports insect-induced changes in vegetation structure prior to wildfire (Watt et al 2018, 2020), the causality between these changes and wildfire impacts such as changes in severity remain uncertain. This is because trying to establish how SBW legacies impact fire severity causally requires a control observation to compare outcomes, and since most studies rely on historical defoliation and wildfire observational data. Identifying a control group is difficult as factors that influence fire outcomes include slope, vegetation type, or vegetation moisture. Therefore, establishing a control observation requires identifying statistically similar controls that burned under similar conditions. Fortunately, pre-processing methods such as propensity score matching are an established method for identifying such quasi-experimental controls in wildfire studies (Bustic, Woo x2 etc). Using pre-processed datasets, analysis such as linear regression can be used to predict treatment effect on fire severity.</p>
+<p>In observational studies, propensity score matching (PSM) is a common statistical technique applied to create a control group that is comparable in confounding variables to a treatment group in studies where treatments are unable to be randomly assigned. For each observation a propensity score (PS) is calculated which reflects the probability of receiving the treatment based on observed characteristics (i.e., potential confounders). Using PS researchers can match participants from the treatment group with those from the control group based on the similarity between scores. The degree of similarity can be selected by researchers. Referred to as the caliper, it is suggested that the degree of similar is within +/- 0.3. By simulating the conditions of a randomized controlled trial, the process of PS matching helps to balance the groups on observed characteristics, thereby reducing bias and allowing for a more accurate estimate of the treatment’s impact. Using the balanced dataset, researchers are able to provide a more robust and reliable estimate of the treatment’s effect.</p>
+<p>In this study, we aim to reduce the uncertainty surrounding the impacts of spatial legacies of SBW defoliation on wildfire in Ontario’s boreal shield. We applied PSM to create a balanced control-treatment experimental design with observation data on wildfire-defoliation co-occurrences. We identified wildfires-defoliation co-occurrences between 1985-2012 using aerial-survey defoliation data and remotely sensed wildfire data. For each area, we quantified median burn severity and mean recovery magnitude. Spectral recovery trajectories were used to estimate post-fire recovery, as recent research shows they are effective and accurate at capturing post-fire structural recovery patterns in North American boreal forests (Smith‐Tripp et al 2024). Using these data, we estimated the average treatment effect (ATT) of defoliation on wildfire outcomes.</p>
+</section>
+<section id="question" class="level2">
+<h2 class="anchored" data-anchor-id="question">Question</h2>
+<p>How does defoliation influence <strong>(a) burn severity</strong> and <strong>(b) recovery magnitude</strong></p>
+<p>Furthermore, we examine whether the average treatment effect is different at the three separate time periods after SBW defoliation outlined by Fleming et al.&nbsp;(2002)</p>
+</section>
+<section id="methods" class="level2">
+<h2 class="anchored" data-anchor-id="methods">Methods</h2>
+<section id="study-area" class="level3">
+<h3 class="anchored" data-anchor-id="study-area">Study area</h3>
+<p>We focused our analysis on the boreal shield ecozone of Ontario (65,336,847 ha) <a href="#fig-study-area-2">Figure&nbsp;1</a>. There is a climatic gradient across this region, with colder and drier conditions in the west and more precipitation to the east (Girardin and Mudelsee 2008). The area is predominantly covered by black spruce (picea mariana) and balsam fir (abies balsamea).</p>
+<p>Spruce budworm outbreaks have frequently erupted across Ontario’s boreal shield ecoregion over the past few decades. A severe outbreak occured from 1968 to 1988 where insect activity peaked around 1980. This outbreak was followed by a second, moderate severity outbreak that erupted in 2000s that continued well into into the 2010s (Navarro et al 2018, Berguet et al 2021).</p>
+<div class="cell">
+
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-study-area-2" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="fire_insect_co-occurence_report_files/figure-html/fig-study-area-2-1.png" class="img-fluid figure-img" width="672"></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;1: Study area fires</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="fire-data" class="level3">
+<h3 class="anchored" data-anchor-id="fire-data">Fire data</h3>
+<p>We obtained wildfire occurrence and polygon data for the years 1986 to 2012 from the National Burned Area Composite for the boreal shield ecozone of Ontario (Skakun et al 2022). We excluded all fires that were classified as prescribed burns and removed those categorized as reburns – fires that burned through a previously burnt area - following an existing protocol (Whitman et al 2020). Reburns can exhibit significant variation in burn severity relative to areas without recent history of wildfire (Whitman et al 2019). Fires were removed if the overlap between polygons was greater than the smallest area burned in our dataset (40ha) or if the gap between the fires was equal to or less than 26 years. The 26-year threshold represents the earliest year for which we had fire perimeter data for the first fire in our dataset.</p>
+</section>
+<section id="spruce-budworm-data" class="level3">
+<h3 class="anchored" data-anchor-id="spruce-budworm-data">Spruce budworm data</h3>
+<p>We obtained defoliation polygons from publicly available forest insect damage events maps produced and distributed by Ontario for the years 1975 to 2012. We filtered each dataset to include only spruce budworm polygons. Each dataset attributed a single defoliation event to an individual polygon, with multiple, independent polygons recorded per year. For each province, we consolidated the data by year into a multipolygon dataset, where each row represented all defoliation events that occurred in a single year from 1975 to 2012. This allowed us to count the number of years a specific area had been defoliated by assessing the overlap of polygons across different years.</p>
+</section>
+<section id="fire-selection" class="level3">
+<h3 class="anchored" data-anchor-id="fire-selection">Fire selection</h3>
+<p>We identified wildfire-insect co-occurrences by identifying fires that burned in defoliated areas. For each fire, we calculated the intersection between the fire polygon and any defoliated polygon for 15 years prior to the year of the fire event. We restricted the time between defoliation events and wildfire occurrence were 15 years because previous evidence suggests that the spatial legacies of defoliation have a negligible impact on wildfire behavior beyond 15 years, with the greatest impact occurring between 3-9 years following defoliation (Fleming et al 2002a, James et al 2017). For every co-occurrence between a wildfire and insect polygon, we generated a polygon of the intersection (referred to hereafter as co-occurence polygon). Using the resulting co-occurrence polygon and the orgginal fire polygon, we calculated the percentage of the fire polygon that was defoliated in each year by dividing the total are of the fire polygon by the co-occurrence polygon area multiplied by 100. Out of all identified co-occurrence years if the percent of maximum overlap was less than 5% we removed that co-occurrence from our dataset due to the coarseness of defoliation polygons inherent to aerial sketch maps. Additionally, we found that there are only 11 fires below 90% overlap between wildfire-insect co-occurrence. We decided to remove all fires where max overlap was below 90%, for a final sample size of 256 defoliated fires <a href="#tbl-overlap">Table&nbsp;1</a>. In addition to percent overlap, we also quantified time since defoliation and cumulative years defoliation. We quantified the cumulative years a single fire event was defoliated by counting the number of co-occurrence polygons. Time since defoliation was calculated as the difference between the year of the fire event and the last year an intersection co-occurrence was identified. Out of 1,601 total fires that burned between 1986 and 2012, we identified # total fires that had a history of defoliation.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="tbl-overlap" class="anchored">
+
+<table class="table" style="margin-left: auto; margin-right: auto;"><caption>Table&nbsp;1:  Distribution of Percent Overlap between Wildfire-Insect co-occurrence </caption>
+ <thead>
+  <tr>
+   <th style="text-align:center;"> Percent Overlap </th>
+   <th style="text-align:center;"> Number of Fires </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:center;"> 0-10% </td>
+   <td style="text-align:center;"> 2 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> 10-20% </td>
+   <td style="text-align:center;"> 5 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> 60-70% </td>
+   <td style="text-align:center;"> 3 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> 70-80% </td>
+   <td style="text-align:center;"> 1 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> 90-100% </td>
+   <td style="text-align:center;"> 111 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> 100% </td>
+   <td style="text-align:center;"> 145 </td>
+  </tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</section>
+<section id="burn-severity-and-recovery-magnitude-data" class="level3">
+<h3 class="anchored" data-anchor-id="burn-severity-and-recovery-magnitude-data">Burn Severity and recovery magnitude data</h3>
+<p>The normalized burn ratio (NBR) data used to quantify burn severity and recovery magnitude were derived from the LandTrendr spectral-temporal segmentation algorithm, as detailed by Kennedy et al.&nbsp;(2010). Briefly, LandTrendr (Landsat-based Detection of Trends in Disturbance and Recovery) is designed to reduce noise commonly found in pixel-level analysis by producing a spectral trajectory from Landsat image pixels (Kennedy et al 2010). LandTrendr takes a time series of a spectral index, most commonly NBR or NDVI, and identifies breakpoints between consecutive observations in an otherwise stable time series. Using these breakpoints, LandTrendr creates a new time series where each annual observation is interpolated onto a line of best fit through the observation. This resulting time series focuses on significant, long-term changes in a pixel. Compared to unaltered surface reflectance data, fitted LandTrendr data reduces pixel-level variability caused by climate, atmosphere, phenology, and sun angle. Additionally, the time series produced by LandTrendr allows easy extraction of the magnitude and duration of changes in the spectral index. Fitted LandTrendr data are often used to examine the effects of wildfires on vegetation change (i.e., burn severity) and recovery (Bright et al 2019).</p>
+<p>We extracted the fitted NBR data using the Google Earth Engine implementation of LandTrendr (Kennedy et al 2018). For each matched pair (defoliated/non-defoliated portion of the fire event), we assembled a cloud-free Landsat image collection from TM, ELM+ and OLI sensors for all available images between April 31st and October 31st of each year between the year before the fires up to 10 years after the fire year, resulting in a collection of spanning 12 years. Composite images were calculated using a medoid approach for each year in the collection. Medoid compositing selects the most representative pixel in a series that is closest to the median of all pixel values. The result was a single, cloud-free image for each year in the series for each fire. We calculated the NBR from the medoid images and input the time series into the LandTrendr algorithm, resulting in a smoothed NBR times series for each pixel, free of noise.</p>
+<p>Using the NBR time series, we calculated percent recovery magnitude and the relativized burn ration (RBR) for each pixel in the series. Recovery magnitude, which is the percent recovery of NBR 10 years after the fire, is calculated by dividing the NBR of the final year in the time series by the difference between the NBR for the year before the fire and the NBR for the year of the fire, multiplied by 100 (Fig S1). The relativized burn ratio (RBR) is a Landsat-based metric that captures changes in forest cover following a fire relative to pre-fire vegetation. RBR is more robust than other Landsat-based measures (e.g., RdNBR) because it is more sensitive to pre-fire values when vegetation cover is low (Parks et al 2014b). RBR is calculated by dividing the dNBR by the pre-fire NBR value (see Supplementary Materials for the equation). In this calculation we also included an offset..</p>
+</section>
+<section id="climate-and-fire-weather-data" class="level3">
+<h3 class="anchored" data-anchor-id="climate-and-fire-weather-data">Climate and fire weather data</h3>
+<p>To quantify the effect of fire weather on burn severity we used fire weather indices from the Canadian Forest Fire Weather Index (FWI) System (Van Wagner 1987). The FWI system is part of the foundation of Canada’s wildfire risk assessment and used operationally by forest managers to effectively predict and evaluate wildfire danger both in Canada and globally. The FWI system is a weather-based system that outputs six indices that are numeric ratings which represent daily fuel moisture and fire behaviour potential. Fine fuel moisture code (FFMC) captures the moisture content of litter fuels. Duff moisture code (DMC) captures the moisture content of loosely compacted organic layers. Drought code (DC) captures the average moisture content of deep organic layers. Initial spread Index (ISI) represents the expected rate of fire spread. Build-up index (BUI) represents the total amount of fuel available to burn. Fire weather index (FWI), which combines ISI and BUI, provides a measure of potential fire intensity. These FWI metrics have been used previously to successfully model wildfire severity in the boreal forest (Whitman et al 2018, San‐Miguel et al 2020, Talucci et al 2022).</p>
+<p>Daily fire weather is a strong top-down drive of burn severity (Whitman et al 2018). Because the FWI system represents daily fuel moisture and fire potential, and our measure of burn severity is a single value taken at the end of the fire duration, day-to-day variation over the course of the fire may influence burn severity. To control for this variation in daily fire weather, we calculated the 90th percentile of all indices over the known duration of the fire. This method allows us to capture only extreme FWI events, which have the most influence on wildfire burn severity (Whitman et al 2018). Daily FWI values were interpolated using thin-plate splines to the centroid of each fire perimeter from weather stations across our study region from the day of the year that the fire started burning to the reported fire out date. Because weather station data was only available from 1990 onwards, we focused on fires that burned between 1990.</p>
+</section>
+<section id="forest-composition" class="level3">
+<h3 class="anchored" data-anchor-id="forest-composition">Forest Composition</h3>
+<p>To understand how forest composition affects burn severity and recovery, we analyzed the percentage of each fire-affected area classified as coniferous, broadleaf or mixedwood. We used high-resolution annual forest land cover maps of Canada’s forested ecosystems (Hermosilla et al 2022) available in Google Earth Engine. These maps, derived from Landsat time series at a 30-m spatial resolution, represent annual forest land cover. For each year, the maps were created using a best-available-pixel composite image for August 1st and 30th. We calculated the percentage of coniferous, broadleaf or mixedwood areas within the perimeter for each fire-affected area for the year before the fire occurred. We avoided using data from the fire year itself to prevent wildfire events from skewing the estimation of forest composition.</p>
+</section>
+<section id="statistical-matching" class="level3">
+<h3 class="anchored" data-anchor-id="statistical-matching">Statistical matching</h3>
+<p>Following processing steps outlined above, we identified 807 fires that that burned between 1990 and 2012 prior to matching, consisting of 551 fires without a history of defoliation, and 256 fires with defoliation history (<a href="#tbl-ss-nine">Table&nbsp;2</a>, <a href="#fig-study-area-2">Figure&nbsp;1</a> A)). For the purpose of this study, we consider treatment units as fires with a history of defoliation, and control units as those fires without a history of defoliation. In this observational study where assigning randomized treatments was not possible, matching allowed us to reduce bias by creating a sample where confounding factors are balanced between treatment and control units, mimicking a randomized controlled trial matching allows researchers to attribute differences in outcomes more confidently to the treatment rather that confounding variables.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="tbl-ss-nine" class="anchored">
+
+<table class="table" style="margin-left: auto; margin-right: auto;"><caption>Table&nbsp;2:  Sample size of defoliated and non-defoliated fires with a maximum overlap greater than 90% </caption>
+ <thead>
+  <tr>
+   <th style="text-align:center;"> history </th>
+   <th style="text-align:center;"> Number of Fires </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:center;"> Non-Defoliated </td>
+   <td style="text-align:center;"> 551 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> Defoliated </td>
+   <td style="text-align:center;"> 256 </td>
+  </tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>We used the MatchIt package in R (Ho et al.&nbsp;2011) to match the treatment fires (defoliated) with control fires (non-defoliated) with the most similar covariate values. Initially, we conducted propensity score martching (PSM) on the entire dataset. The covariates we matched on in the model were weather, topography, spatial and environmental covariates <strong>(TABLE)</strong>. We estimated propensity scores using a generalized linear model with a probit link function. We used nearest neighbor matching with a caliper of 0.10 to ensure that matched pairs had similar propensity scores. Our target estimate was the average treatment effect in the treated (defoliated) fires (ATT). We estimated propensity scores using a generalized linear model with a probit link function. We used nearest neighbor matching with a caliper of 0.10 to ensure that matched pairs had similar propensity scores. Our target estimate was the average treatment effect in the treated (defoliated) fires (ATT). We assessed covariate balance before and after matching using the love plots of the standardized mean difference (SMD) <a href="#fig-asmd">Figure&nbsp;2</a>, and density plots of all covariates <strong>?@fig-density-cov</strong> using the cobalt package (Greifer, 2023). SMD represents the mean difference between treatment and control units and we considered a threshold of &lt; 0.25 as an indication of acceptable covariate balance (Stuart et al., 2013). Our final sample sizes after matching were 165 treated and control units respectively <a href="#fig-study-area-2">Figure&nbsp;1</a> B).</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-asmd" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="fire_insect_co-occurence_report_files/figure-html/fig-asmd-1.png" class="img-fluid figure-img" width="672"></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;2: Comparison of covariate balance using covariate means for treatment and control units before matching (orange) and after matching (red) to assess whether matching has improved balance. Mean values &lt; 0.25 are considered acceptable covariate balance, dotted line represents 0.1.</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="fire_insect_co-occurence_report_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid" width="768"></p>
+</div>
+</div>
+<p>For the subgroup analysis, prior to matching we subset the defoliated fires into three categories based on the time since defoliation. The categories were defined according to the “window of opportunity” outline by Fleming et al.&nbsp;(2002), who found that wildfire frequency and behaviour was disproportionately higher 3-9 years following defoliation. We subset defoliated fires into the following 3 categories: 0-2 years after defoliation, 3-9 years and greater than 10 years <a href="#tbl-ss-subgroup">Table&nbsp;3</a>. We compared multiple matching matching methods for each subgroup. The model with the best fit was chosen as the model with the best covariate balance evaluated using SMD &lt;0.25 for each covariate (Stuart et al.&nbsp;2013). We evaluated matching on propensity score and/or Mahalanobis distances without replacement. Propensity scores were estimated using both nearest neighbour and optimal matching with either logit or probit link functions and we evaluated three separate calipers (Appendix A). The best model for each subgroup is presented in <strong>?@tbl-sugroup-best-model</strong>.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="tbl-ss-subgroup" class="anchored">
+
+<table class="table" style="margin-left: auto; margin-right: auto;"><caption>Table&nbsp;3:  Sample size of defoliated and non-defoliated fires with a maximum overlap greater than 90% </caption>
+ <thead>
+  <tr>
+   <th style="text-align:center;"> Number of Fires </th>
+   <th style="text-align:center;"> subgroup </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:center;"> 116 </td>
+   <td style="text-align:center;"> 0-2 years after defoliation </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> 105 </td>
+   <td style="text-align:center;"> 3-9 years after defoliation </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> 149 </td>
+   <td style="text-align:center;"> 10+ years after defoliation </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> 550 </td>
+   <td style="text-align:center;"> Non-Defoliated </td>
+  </tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div class="cell">
+
+</div>
+<section id="subgroup-analysis-after-propensity-score-matching" class="level4">
+<h4 class="anchored" data-anchor-id="subgroup-analysis-after-propensity-score-matching">Subgroup analysis after propensity score matching</h4>
+<p>make a function that tries a bunch of different matching, with and without replacement</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>A `matchit` object
+ - method: 1:1 nearest neighbor matching without replacement
+ - distance: Mahalanobis [matching]
+             Propensity score [caliper]
+
+             - estimated with logistic regression
+ - caliper: &lt;distance&gt; (0.048)
+ - number of obs.: 699 (original), 200 (matched)
+ - target estimand: ATT
+ - covariates: host_pct, isi_90, dc_90, dmc_90, ffmc_90, bui_90, fwi_90</code></pre>
+</div>
+</div>
+<div class="cell">
+
+</div>
+<div class="cell">
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: The arguments `caliper` and `m.order` are not used with `method =
+"optimal"` and will be ignored.
+The arguments `caliper` and `m.order` are not used with `method =
+"optimal"` and will be ignored.
+The arguments `caliper` and `m.order` are not used with `method =
+"optimal"` and will be ignored.
+The arguments `caliper` and `m.order` are not used with `method =
+"optimal"` and will be ignored.
+The arguments `caliper` and `m.order` are not used with `method =
+"optimal"` and will be ignored.
+The arguments `caliper` and `m.order` are not used with `method =
+"optimal"` and will be ignored.
+The arguments `caliper` and `m.order` are not used with `method =
+"optimal"` and will be ignored.
+The arguments `caliper` and `m.order` are not used with `method =
+"optimal"` and will be ignored.
+The arguments `caliper` and `m.order` are not used with `method =
+"optimal"` and will be ignored.
+The arguments `caliper` and `m.order` are not used with `method =
+"optimal"` and will be ignored.
+The arguments `caliper` and `m.order` are not used with `method =
+"optimal"` and will be ignored.
+The arguments `caliper` and `m.order` are not used with `method =
+"optimal"` and will be ignored.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: The argument `m.order` is not used with `method = "optimal"` and will
+be ignored.
+The argument `m.order` is not used with `method = "optimal"` and will
+be ignored.
+The argument `m.order` is not used with `method = "optimal"` and will
+be ignored.
+The argument `m.order` is not used with `method = "optimal"` and will
+be ignored.
+The argument `m.order` is not used with `method = "optimal"` and will
+be ignored.
+The argument `m.order` is not used with `method = "optimal"` and will
+be ignored.
+The argument `m.order` is not used with `method = "optimal"` and will
+be ignored.
+The argument `m.order` is not used with `method = "optimal"` and will
+be ignored.
+The argument `m.order` is not used with `method = "optimal"` and will
+be ignored.
+The argument `m.order` is not used with `method = "optimal"` and will
+be ignored.
+The argument `m.order` is not used with `method = "optimal"` and will
+be ignored.
+The argument `m.order` is not used with `method = "optimal"` and will
+be ignored.</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 2
+  history        `Number of Fires`
+  &lt;chr&gt;                      &lt;int&gt;
+1 Non-Defoliated                94
+2 Defoliated                    94</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 2
+  history        `Number of Fires`
+  &lt;chr&gt;                      &lt;int&gt;
+1 Non-Defoliated               105
+2 Defoliated                   105</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 2
+  history        `Number of Fires`
+  &lt;chr&gt;                      &lt;int&gt;
+1 Non-Defoliated               149
+2 Defoliated                   149</code></pre>
+</div>
+</div>
+<div class="cell">
+
+</div>
+<div class="cell">
+
+</div>
+<div class="cell">
+
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="fire_insect_co-occurence_report_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div id="tbl-sugroup-best-model" class="cell tbl-parent quarto-layout-panel anchored" data-tbl-cap="Matching parameters for subgroup models chosen based on best covariate balance of all covariates with SMD <0.25.">
+<div class="panel-caption table-caption">
+<p><strong>?(caption)</strong></p>
+</div>
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="cell-output cell-output-stdout quarto-layout-cell" style="flex-basis: 100.0%;justify-content: center;">
+<pre><code>                     Subgroup                                            Method
+1 0-2 years after defoliation 1:1 nearest neighbor matching without replacement
+2 3-9 years after defoliation 1:1 nearest neighbor matching without replacement
+3 10+ years after defoliation 1:1 nearest neighbor matching without replacement
+                                                                                  Matching
+1 Mahalanobis distance for matching and a propensity score caliper to ensure close matches
+2                                                                              Mahalanobis
+3                                                                              Mahalanobis
+                                  Distance  Link    Caliper
+1 estimated with logistic regression (glm) logit 0.03893007
+2     estimated with mahalanobis distances  &lt;NA&gt;         NA
+3     estimated with mahalanobis distances  &lt;NA&gt;         NA</code></pre>
+</div>
+</div>
+</div>
+</section>
+<section id="host-species-percentage" class="level4">
+<h4 class="anchored" data-anchor-id="host-species-percentage">Host species percentage</h4>
+<p>Now lets look at the distribution of host species percentage with this subset of data</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="tbl-host-species-percentage" class="anchored">
+
+<table class="table" style="margin-left: auto; margin-right: auto;"><caption>Table&nbsp;4:  Distribution of Host Species Percentage between Wildfire-Insect co-occurrence </caption>
+ <thead>
+  <tr>
+   <th style="text-align:center;"> Host Percent </th>
+   <th style="text-align:center;"> Defoliated Fires </th>
+   <th style="text-align:center;"> Non-Defoliated Fires </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:center;"> 0-10% </td>
+   <td style="text-align:center;"> 6 </td>
+   <td style="text-align:center;"> 1 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> 10-20% </td>
+   <td style="text-align:center;"> 14 </td>
+   <td style="text-align:center;"> 1 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> 20-30% </td>
+   <td style="text-align:center;"> 10 </td>
+   <td style="text-align:center;"> 2 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> 30-40% </td>
+   <td style="text-align:center;"> 11 </td>
+   <td style="text-align:center;"> 4 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> 40-50% </td>
+   <td style="text-align:center;"> 15 </td>
+   <td style="text-align:center;"> 4 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> 50-60% </td>
+   <td style="text-align:center;"> 18 </td>
+   <td style="text-align:center;"> 11 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> 60-70% </td>
+   <td style="text-align:center;"> 14 </td>
+   <td style="text-align:center;"> 13 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> 70-80% </td>
+   <td style="text-align:center;"> 39 </td>
+   <td style="text-align:center;"> 15 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> 80-90% </td>
+   <td style="text-align:center;"> 42 </td>
+   <td style="text-align:center;"> 19 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> 90-100% </td>
+   <td style="text-align:center;"> 75 </td>
+   <td style="text-align:center;"> 295 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> 100% </td>
+   <td style="text-align:center;"> 12 </td>
+   <td style="text-align:center;"> 186 </td>
+  </tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>For non-defoliated fires, there are only single digit non-defoliated for host percent before 50. In the following analysis we will look at the distribution of fires for each bin</p>
+</section>
+</section>
+</section>
+</section>
+<section id="section" class="level1">
+<h1></h1>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
