@@ -459,7 +459,7 @@ plot_grid(host_plot, isi_plot, dc_plot, dmc_plot, ffmc_plot, bui_plot,fwi_plot, 
 
 ```
 
-For the subgroup analysis, prior to matching we subset the defoliated fires into three categories based on the time since defoliation. The categories were defined according to the "window of opportunity" outline by Fleming et al. (2002), who found that wildfire frequency and behaviour was disproportionately higher 3-9 years following defoliation. We subset defoliated fires into the following 3 categories: 0-2 years after defoliation, 3-9 years and greater than 10 years @tbl-ss-subgroup. We compared multiple matching matching methods for each subgroup. The model with the best fit was chosen as the model with the best covariate balance evaluated using SMD \<0.25 for each covariate (Stuart et al. 2013). We evaluated matching on propensity score and/or Mahalanobis distances without replacement. Propensity scores were estimated using both nearest neighbour and optimal matching with either logit or probit link functions and we evaluated three separate calipers (Appendix A). The best model for each subgroup is presented in @tbl-sugroup-best-model.
+For the subgroup analysis, prior to matching we subset the defoliated fires into three categories based on the time since defoliation. The categories were defined according to the "window of opportunity" outline by Fleming et al. (2002), who found that wildfire frequency and behaviour was disproportionately higher 3-9 years following defoliation. We subset defoliated fires into the following 3 categories: 0-2 years after defoliation, 3-9 years and greater than 10 years @tbl-ss-subgroup. We compared multiple matching matching methods for each subgroup. The model with the best fit was chosen as the model with the best covariate balance evaluated using SMD \<0.25 for each covariate (Stuart et al. 2013). We evaluated matching on propensity score and/or Mahalanobis distances without replacement. Propensity scores were estimated using both nearest neighbour and optimal matching with either logit or probit link functions and we evaluated three separate calipers (Appendix A). The best model for each subgroup is presented in @tbl-sugroup-best-model .
 
 ```{r}
 #| tbl-cap: "Sample size of defoliated and non-defoliated fires with a maximum overlap greater than 90%"
@@ -526,53 +526,12 @@ fit_att <- as.data.frame(marginaleffects::avg_comparisons(fit,
 
 ```
 
-#### Subgroup analysis after propensity score matching
-
-make a function that tries a bunch of different matching, with and without replacement
-
 ```{r}
-
+#| echo: false
 #| warning: false
 #| message: false
-#| echo: false
-#| label: subgroup-psm
+#| label: params
 
-# tsd 1-2 matching on a probit PS
-m.out_w1 <- matchit(history ~  host_pct +isi_90 + dc_90+ dmc_90 + ffmc_90 + bui_90 + fwi_90,
-                  data = hist_gt90_1,
-                  method = "nearest",
-                  distance = "glm",
-                  link = "logit",
-                  m.order = "random",
-                 ### set a maximum distance for the matches
-                 caliper = 0.2,
-replace = TRUE)
-
-# tsd 1-2 matching on a probit PS
-m.out_w2 <- matchit(history ~  host_pct  + isi_90 + dc_90+ dmc_90 + ffmc_90 + bui_90 + fwi_90,
-                  data = hist_gt90_2,
-                  method = "nearest",
-                  distance = "glm",
-                  link = "logit",
-                  m.order = "random",
-                 ### set a maximum distance for the matches
-                 caliper = 0.2
-                 #mahvars = ~host_pct +isi_90 + dc_90+ dmc_90 + ffmc_90 + bui_90 + fwi_90,
-)
-
-# tsd 1-2 matching on a probit PS
-m.out_w3 <- matchit(history ~  host_pct +  isi_90 + dc_90+ dmc_90 + ffmc_90 + bui_90 + fwi_90,
-                  data = hist_gt90_3,
-                  distance = "glm",
-                  m.order = "random",
-                  caliper = .2,
-                  mahvars = ~host_pct +isi_90 + dc_90+ dmc_90 + ffmc_90 + bui_90 + fwi_90
-                  )
-m.out_w3
-```
-
-```{r}
-# Set parameters:
 methods <- c("nearest", "optimal")
 distances <- c("glm", "mahalanobis")
 links <- c("logit", "probit")
@@ -733,8 +692,77 @@ ggplot(att_comparison, aes(x = Fires, y = estimate)) +
 #| label: tbl-sugroup-best-model
 #| tbl-cap: Matching parameters for subgroup models chosen based on best covariate balance of all covariates with SMD <0.25.
 
-extract_best_model_params(best_model_1, best_model_2, best_model_3)
+subgroup_modstruct <- extract_best_model_params(best_model_1, best_model_2, best_model_3)
 
+# View the table
+knitr::kable(subgroup_modstruct,  align = "l") %>%
+  kableExtra::kable_styling(position = "left" )
+
+```
+
+### Defoliation only model
+
+```{r}
+#| echo: false
+#| warning: false
+#| label: full model
+
+library(lme4)
+library(MuMIn)
+library(lmerTest)
+library(nlme)
+library(sp)
+library(gstat)
+
+defol_only <- subset(history_gt90, history == 1)
+
+mixed.mod <- lmer(rbr_w_offset ~host_pct + Cumulative_Years_Defol*Time_Since_Defol + isi_90 + 
+                    dc_90 + dmc_90 + ffmc_90 + bui_90+ fwi_90 + fire_area + x + y + (1| Fire_Year), data = defol_only)
+
+
+t <- coef(summary(as(mixed.mod,"merModLmerTest")))
+MuMIn::r.squaredGLMM(mixed.mod)
+
+# Define the model formula
+formula <- rbr_w_offset ~host_pct + Cumulative_Years_Defol*Time_Since_Defol + isi_90 + 
+                    dc_90 + dmc_90 + ffmc_90 + bui_90+ fwi_90 + fire_area + x + y 
+
+# Fit the model using nlme with spatial correlation
+model_spatial <- lme(fixed = formula, 
+                     random = ~ 1 | Fire_Year, 
+                     correlation = corExp(form = ~ x + y), 
+                     data = defol_only)
+
+# Display the model summary
+summary(model_spatial)
+
+# r2
+r.squaredGLMM(model_spatial)
+
+# extract residuals
+defol_only$residuals <- residuals(model_spatial)
+
+colnames(defol_only) <- make.names(colnames(defol_only))
+
+# get coords
+coordinates(defol_only) <- ~ x + y
+
+# Compute the variogram
+variogram_model <- variogram(residuals ~ 1, data = defol_only)
+
+# Plot the variogram
+plot(variogram_model, main = "Variogram of Residuals")
+
+#
+df <- as.data.frame(defol_only)
+
+# Create a spatial plot of residuals
+ggplot() +
+  geom_sf(data = ontario, fill = "lightgrey", color = "black") +
+  geom_point(data = df, aes(x = x, y = y, color = residuals)) +
+  scale_color_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
+  labs(title = NULL, x = "Longitude", y = "Latitude", color = "Residuals") +
+  theme_bw()
 ```
 
 #### Host species percentage
@@ -804,5 +832,3 @@ knitr::kable(host_spp_pct,  align = "c") %>%
 ```
 
 For non-defoliated fires, there are only single digit non-defoliated for host percent before 50. In the following analysis we will look at the distribution of fires for each bin
-
-# 

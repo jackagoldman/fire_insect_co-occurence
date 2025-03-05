@@ -222,7 +222,7 @@ ul.task-list li input[type="checkbox"] {
 <p><img src="fire_insect_co-occurence_report_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid" width="768"></p>
 </div>
 </div>
-<p>For the subgroup analysis, prior to matching we subset the defoliated fires into three categories based on the time since defoliation. The categories were defined according to the “window of opportunity” outline by Fleming et al.&nbsp;(2002), who found that wildfire frequency and behaviour was disproportionately higher 3-9 years following defoliation. We subset defoliated fires into the following 3 categories: 0-2 years after defoliation, 3-9 years and greater than 10 years <a href="#tbl-ss-subgroup">Table&nbsp;3</a>. We compared multiple matching matching methods for each subgroup. The model with the best fit was chosen as the model with the best covariate balance evaluated using SMD &lt;0.25 for each covariate (Stuart et al.&nbsp;2013). We evaluated matching on propensity score and/or Mahalanobis distances without replacement. Propensity scores were estimated using both nearest neighbour and optimal matching with either logit or probit link functions and we evaluated three separate calipers (Appendix A). The best model for each subgroup is presented in <strong>?@tbl-sugroup-best-model</strong>.</p>
+<p>For the subgroup analysis, prior to matching we subset the defoliated fires into three categories based on the time since defoliation. The categories were defined according to the “window of opportunity” outline by Fleming et al.&nbsp;(2002), who found that wildfire frequency and behaviour was disproportionately higher 3-9 years following defoliation. We subset defoliated fires into the following 3 categories: 0-2 years after defoliation, 3-9 years and greater than 10 years <a href="#tbl-ss-subgroup">Table&nbsp;3</a>. We compared multiple matching matching methods for each subgroup. The model with the best fit was chosen as the model with the best covariate balance evaluated using SMD &lt;0.25 for each covariate (Stuart et al.&nbsp;2013). We evaluated matching on propensity score and/or Mahalanobis distances without replacement. Propensity scores were estimated using both nearest neighbour and optimal matching with either logit or probit link functions and we evaluated three separate calipers (Appendix A). The best model for each subgroup is presented in <a href="#tbl-sugroup-best-model">Table&nbsp;4</a> .</p>
 <div class="cell">
 <div class="cell-output-display">
 <div id="tbl-ss-subgroup" class="anchored">
@@ -259,23 +259,6 @@ ul.task-list li input[type="checkbox"] {
 </div>
 <div class="cell">
 
-</div>
-<section id="subgroup-analysis-after-propensity-score-matching" class="level4">
-<h4 class="anchored" data-anchor-id="subgroup-analysis-after-propensity-score-matching">Subgroup analysis after propensity score matching</h4>
-<p>make a function that tries a bunch of different matching, with and without replacement</p>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code>A `matchit` object
- - method: 1:1 nearest neighbor matching without replacement
- - distance: Mahalanobis [matching]
-             Propensity score [caliper]
-
-             - estimated with logistic regression
- - caliper: &lt;distance&gt; (0.048)
- - number of obs.: 699 (original), 200 (matched)
- - target estimand: ATT
- - covariates: host_pct, isi_90, dc_90, dmc_90, ffmc_90, bui_90, fwi_90</code></pre>
-</div>
 </div>
 <div class="cell">
 
@@ -337,8 +320,8 @@ be ignored.</code></pre>
 <pre><code># A tibble: 2 × 2
   history        `Number of Fires`
   &lt;chr&gt;                      &lt;int&gt;
-1 Non-Defoliated                94
-2 Defoliated                    94</code></pre>
+1 Non-Defoliated                98
+2 Defoliated                    98</code></pre>
 </div>
 </div>
 <div class="cell">
@@ -370,31 +353,55 @@ be ignored.</code></pre>
 </div>
 <div class="cell">
 <div class="cell-output-display">
-<p><img src="fire_insect_co-occurence_report_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid" width="672"></p>
+<p><img src="fire_insect_co-occurence_report_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<div id="tbl-sugroup-best-model" class="cell tbl-parent quarto-layout-panel anchored" data-tbl-cap="Matching parameters for subgroup models chosen based on best covariate balance of all covariates with SMD <0.25.">
-<div class="panel-caption table-caption">
-<p><strong>?(caption)</strong></p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="tbl-sugroup-best-model" class="anchored">
+
+<table class="table" style=""><caption>Table&nbsp;4:  Matching parameters for subgroup models chosen based on best covariate balance of all covariates with SMD &lt;0.25. </caption>
+ <thead>
+  <tr>
+   <th style="text-align:left;"> Subgroup </th>
+   <th style="text-align:left;"> Method </th>
+   <th style="text-align:left;"> Matching </th>
+   <th style="text-align:left;"> Distance </th>
+   <th style="text-align:left;"> Link </th>
+   <th style="text-align:left;"> Caliper </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> 0-2 years after defoliation </td>
+   <td style="text-align:left;"> 1:1 nearest neighbor matching without replacement </td>
+   <td style="text-align:left;"> Mahalanobis distance for matching and a propensity score caliper to ensure close matches </td>
+   <td style="text-align:left;"> estimated with logistic regression (glm) </td>
+   <td style="text-align:left;"> logit </td>
+   <td style="text-align:left;"> 0.0583951 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> 3-9 years after defoliation </td>
+   <td style="text-align:left;"> 1:1 nearest neighbor matching without replacement </td>
+   <td style="text-align:left;"> Mahalanobis </td>
+   <td style="text-align:left;"> estimated with mahalanobis distances </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:left;"> NA </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> 10+ years after defoliation </td>
+   <td style="text-align:left;"> 1:1 nearest neighbor matching without replacement </td>
+   <td style="text-align:left;"> Mahalanobis </td>
+   <td style="text-align:left;"> estimated with mahalanobis distances </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:left;"> NA </td>
+  </tr>
+</tbody>
+</table>
+
 </div>
-<div class="quarto-layout-row quarto-layout-valign-top">
-<div class="cell-output cell-output-stdout quarto-layout-cell" style="flex-basis: 100.0%;justify-content: center;">
-<pre><code>                     Subgroup                                            Method
-1 0-2 years after defoliation 1:1 nearest neighbor matching without replacement
-2 3-9 years after defoliation 1:1 nearest neighbor matching without replacement
-3 10+ years after defoliation 1:1 nearest neighbor matching without replacement
-                                                                                  Matching
-1 Mahalanobis distance for matching and a propensity score caliper to ensure close matches
-2                                                                              Mahalanobis
-3                                                                              Mahalanobis
-                                  Distance  Link    Caliper
-1 estimated with logistic regression (glm) logit 0.03893007
-2     estimated with mahalanobis distances  &lt;NA&gt;         NA
-3     estimated with mahalanobis distances  &lt;NA&gt;         NA</code></pre>
 </div>
 </div>
-</div>
-</section>
 <section id="host-species-percentage" class="level4">
 <h4 class="anchored" data-anchor-id="host-species-percentage">Host species percentage</h4>
 <p>Now lets look at the distribution of host species percentage with this subset of data</p>
@@ -402,7 +409,7 @@ be ignored.</code></pre>
 <div class="cell-output-display">
 <div id="tbl-host-species-percentage" class="anchored">
 
-<table class="table" style="margin-left: auto; margin-right: auto;"><caption>Table&nbsp;4:  Distribution of Host Species Percentage between Wildfire-Insect co-occurrence </caption>
+<table class="table" style="margin-left: auto; margin-right: auto;"><caption>Table&nbsp;5:  Distribution of Host Species Percentage between Wildfire-Insect co-occurrence </caption>
  <thead>
   <tr>
    <th style="text-align:center;"> Host Percent </th>
