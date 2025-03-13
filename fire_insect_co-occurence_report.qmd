@@ -1,5 +1,5 @@
 ---
-title: "fire_insect_co-occurence_report"
+title: "fire_insect_co-occurrence_report"
 format: html
 editor: visual
 tbl-cap-location: top
@@ -137,6 +137,8 @@ In this study, we aim to reduce the uncertainty surrounding the impacts of spati
 How does defoliation influence **(a) burn severity** and **(b) recovery magnitude**
 
 Furthermore, we examine whether the average treatment effect is different at the three separate time periods after SBW defoliation outlined by Fleming et al. (2002)
+
+Within defoliated fires, what are the dominant drivers of burn severity?
 
 ## Methods
 
@@ -459,7 +461,9 @@ plot_grid(host_plot, isi_plot, dc_plot, dmc_plot, ffmc_plot, bui_plot,fwi_plot, 
 
 ```
 
-For the subgroup analysis, prior to matching we subset the defoliated fires into three categories based on the time since defoliation. The categories were defined according to the "window of opportunity" outline by Fleming et al. (2002), who found that wildfire frequency and behaviour was disproportionately higher 3-9 years following defoliation. We subset defoliated fires into the following 3 categories: 0-2 years after defoliation, 3-9 years and greater than 10 years @tbl-ss-subgroup. We compared multiple matching matching methods for each subgroup. The model with the best fit was chosen as the model with the best covariate balance evaluated using SMD \<0.25 for each covariate (Stuart et al. 2013). We evaluated matching on propensity score and/or Mahalanobis distances without replacement. Propensity scores were estimated using both nearest neighbour and optimal matching with either logit or probit link functions and we evaluated three separate calipers (Appendix A). The best model for each subgroup is presented in @tbl-sugroup-best-model .
+#### Subgroup analysis
+
+We examined whether the average defoliation effect differs according to various levels of time since defoliation. Prior to matching we subset the defoliated fires into three categories based on the time since defoliation. The categories were defined according to the "window of opportunity" outline by Fleming et al. (2002), who found that wildfire frequency and behaviour was disproportionately higher 3-9 years following defoliation. We subset defoliated fires into the following 3 categories: 0-2 years after defoliation, 3-9 years and greater than 10 years @tbl-ss-subgroup. We compared multiple matching matching methods for each subgroup. The model with the best fit was chosen as the model with the best covariate balance evaluated using SMD \<0.25 for each covariate (Stuart et al. 2013). We evaluated matching on propensity score, Mahalanobis distance, or matching on Mahalanobis distance while restricting propensity score between pairs. A combination of the two approached often preforms better then each individually (Rosenbaum and Rubin 1989). Matching occurred without replacement. Propensity scores were estimated using both nearest neighbour and optimal matching with either logit or probit link functions and we evaluated three separate calipers (Appendix A). The best model for each subgroup is presented in @tbl-sugroup-best-model. Using the best model for each subgroup, we calculated the average treatment effect (ATT) of defoliation history.
 
 ```{r}
 #| tbl-cap: "Sample size of defoliated and non-defoliated fires with a maximum overlap greater than 90%"
@@ -700,7 +704,9 @@ knitr::kable(subgroup_modstruct,  align = "l") %>%
 
 ```
 
-### Defoliation only model
+#### Drivers of burn severity within defoliated fires
+
+The distribution and connectivity of combustible fuels and fire weather jointly influence wildfire dynamics. Under extreme fire weather conditions the effects of fuels are less impactful and their effects do not emerge from models of wildfire behavior (Podur et al 2009). However, following defoliation we expect the impact of fuel to be greater(emerge, etc.). Therefore, we examined the drivers of burn severity within the subset of fires that had a history of defoliation (n = 256). We modeled burn severity as a function of host percentage, cumulative years of defoliation, time since defoliation, and several fire weather indices. Time since defoliation was modeled as a factor with 3 levels corresponding to three windows of opportunity. We included an interaction between cumulative years of defoliation and time since defoliation, as we predict defoliation recurring in successive years will have amplify the impacts of defoliation history depending on the time since defoliation. We fit a generalized least squares (GLS) model with a Gaussian spatial correlation structure, where correlation decreases with distance. Model fit was assessed by plotting residuals against fitted values (Appendix 1), and indicated a good fit with residuals centered around zero. To assess spatial autocorrelation, a variogram of the residuals was computed (Appendix 1) and plotted the spatial distribution of the model residuals @fig-spatial-residuals.
 
 ```{r}
 #| echo: false
@@ -714,33 +720,41 @@ library(nlme)
 library(sp)
 library(gstat)
 
+
+# defol dataset
 defol_only <- subset(history_gt90, history == 1)
 
-mixed.mod <- lmer(rbr_w_offset ~host_pct + Cumulative_Years_Defol*Time_Since_Defol + isi_90 + 
-                    dc_90 + dmc_90 + ffmc_90 + bui_90+ fwi_90 + fire_area + x + y + (1| Fire_Year), data = defol_only)
+# shift window_opp to 1-3 from 0-2
+defol_only <- defol_only %>%
+  mutate(window_opp = case_when(window_opp == "0" ~ "1",
+                                TRUE ~ window_opp))
 
-
-t <- coef(summary(as(mixed.mod,"merModLmerTest")))
-MuMIn::r.squaredGLMM(mixed.mod)
 
 # Define the model formula
-formula <- rbr_w_offset ~host_pct + Cumulative_Years_Defol*Time_Since_Defol + isi_90 + 
-                    dc_90 + dmc_90 + ffmc_90 + bui_90+ fwi_90 + fire_area + x + y 
+formula <- rbr_w_offset ~host_pct +  Cumulative_Years_Defol:window_opp + isi_90 + 
+                    dc_90 + dmc_90 + ffmc_90 + bui_90+ fwi_90 +  x + y 
 
-# Fit the model using nlme with spatial correlation
-model_spatial <- lme(fixed = formula, 
-                     random = ~ 1 | Fire_Year, 
-                     correlation = corExp(form = ~ x + y), 
-                     data = defol_only)
+# Fit the model using nlme with spatial correlation, where correlation decreases with distance
+# gls
+
+model_gls <- gls(formula,
+                 correlation = corGaus(form = ~ x + y), 
+                 data = defol_only)
+
+# Residuals vs. Fitted Values Plot
+residual_plot <- plot(fitted(model_gls), resid(model_gls)) +abline(h = 0, col = "red") # fit is good
+
+#model_glsI <- update(model_gls, weights = varIdent(form = ~ 1 | Time_Since_Defol))
+
 
 # Display the model summary
-summary(model_spatial)
+summary(model_gls)
 
 # r2
-r.squaredGLMM(model_spatial)
+rsquared.gls(model_gls, formula)
 
 # extract residuals
-defol_only$residuals <- residuals(model_spatial)
+defol_only$residuals_gls <- residuals(model_gls)
 
 colnames(defol_only) <- make.names(colnames(defol_only))
 
@@ -748,24 +762,37 @@ colnames(defol_only) <- make.names(colnames(defol_only))
 coordinates(defol_only) <- ~ x + y
 
 # Compute the variogram
-variogram_model <- variogram(residuals ~ 1, data = defol_only)
+variogram_gls <- variogram(residuals_gls ~ 1, data = defol_only)
 
 # Plot the variogram
-plot(variogram_model, main = "Variogram of Residuals")
+var_plot <- plot(variogram_gls, main = "Variogram of Residuals (Gaussian)")
 
-#
+# confirm defol_only as dataframe
 df <- as.data.frame(defol_only)
+
+gls_pvalues_to_kable(model_gls)
+
+```
+
+```{r}
+#| label: fig-spatial-residuals
+#| fig-cap: Spatial distribution of model residuals. 
+#| echo: false
+#| warning: false
+#| message: false
+
+
 
 # Create a spatial plot of residuals
 ggplot() +
-  geom_sf(data = ontario, fill = "lightgrey", color = "black") +
-  geom_point(data = df, aes(x = x, y = y, color = residuals)) +
-  scale_color_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
+  geom_sf(data = ontario, fill = "navajowhite1", color = "black") +
+  geom_point(data = df, aes(x = x, y = y, color = residuals_gls)) +
+  scale_color_gradient2(low = "#88CCEEA0", mid = "white", high = "#8B0000A0", midpoint = 0) +
   labs(title = NULL, x = "Longitude", y = "Latitude", color = "Residuals") +
   theme_bw()
 ```
 
-#### Host species percentage
+### Host species percentage
 
 Now lets look at the distribution of host species percentage with this subset of data
 

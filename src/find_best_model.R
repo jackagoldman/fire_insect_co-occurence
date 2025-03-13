@@ -186,3 +186,76 @@ extract_best_model_params <- function(best_model_1, best_model_2, best_model_3) 
   
   return(combined_params_df)
 }
+
+#' Calculate R-squared for GLS Model
+#'
+#' This function calculates the R-squared value for a Generalized Least Squares (GLS) model.
+#'
+#' @param model A GLS model object of class `gls`.
+#' @param formula A formula specifying the model.
+#' @return The R-squared value for the GLS model.
+#' @examples
+#' library(nlme)
+#' gls_model <- gls(y ~ x, data = your_data, correlation = corExp(form = ~ x))
+#' rsquared.gls(gls_model, y ~ x)
+#' @export
+rsquared.gls <- function(model, formula) {
+  # Extract the data used to fit the model
+  data <- getData(model)
+  
+  # Extract the response variable
+  response <- model$terms[[2]]
+  y <- data[[as.character(response)]]
+  
+  # Create the model matrix
+  X <- model.matrix(formula, data = data)
+  
+  # Calculate the variance of the fitted values
+  sigmaF <- var(as.vector(model$coefficients %*% t(X)))
+  
+  # Calculate the variance of the residuals
+  sigmaE <- var(resid(model))
+  
+  # Calculate R-squared
+  R_squared <- sigmaF / (sigmaF + sigmaE)
+  
+  print(R_squared)
+}
+
+
+#' Extract P-Values from GLS Model Summary and Convert to Kable
+#'
+#' This function extracts the p-value table from a GLS model summary and converts it to a `kable` object for easy visualization.
+#'
+#' @param model_gls A GLS model object of class `gls`.
+#' @return A `kable` object containing the p-values from the GLS model summary.
+#' @examples
+#' \dontrun{
+#' library(nlme)
+#' library(knitr)
+#' library(dplyr)
+#'
+#' # Fit a sample GLS model
+#' model_gls <- gls(distance ~ age + Sex, data = Orthodont, correlation = corGaus(form = ~ age))
+#'
+#' # Get the p-value table as a kable object
+#' gls_pvalues_to_kable(model_gls)
+#' }
+#' @export
+gls_pvalues_to_kable <- function(model_gls) {
+  require(kableExtra)
+  # Get the summary of the GLS model
+  summary_gls <- summary(model_gls)
+  
+  # Extract the p-value table
+  p_values <- summary_gls$tTable %>%
+    as.data.frame() %>%
+    select(c(Value, Std.Error ,`t-value` ,`p-value`)) %>% 
+    rename(P = `p-value`)
+  
+  # Convert the p-value table to a kable object
+  kable(p_values)
+}
+
+
+
