@@ -47,6 +47,21 @@ history <- history %>%
 # read in centroids
 centroids <- read.csv("/home/goldma34/fire_insect_co-occurence/data/outputs/on/on_fire_centroids.csv")
 
+
+# read in recovery
+recovery_defol = read.csv("/home/goldma34/fire_insect_co-occurence/data/outputs/on/on_recovery_magnitude/on_recovery_magnitude.csv")
+
+recovery_non_defol = read.csv("/home/goldma34/fire_insect_co-occurence/data/outputs/no_history/on_no_history_recovery_magnitude.csv")
+
+# merge recovery dataframes
+recovery <- rbind(recovery_defol, recovery_non_defol) %>% 
+  select(-c("X")) %>% 
+  rename(recovery = Average.Recovery)
+
+# join recovery to history
+history <- history %>% 
+  left_join(recovery, by = "Fire_ID")
+
 # join fire centroids to history
 history <- history %>% 
   left_join(centroids, by = "Fire_ID")
@@ -126,11 +141,11 @@ m.data.sf <- st_as_sf(m.data, coords = c("x", "y"), crs = 4326)
 
 ## Background
 
-Fire severity is a measure of biomass and soil change used to gauge how intensely an ecosystem was impact by fire (Lentile et al 2013). A number of studies have hypothesized about the potential impact that spatial legacies of SBW defoliation may have on wildfires. While there is evidence that supports insect-induced changes in vegetation structure prior to wildfire (Watt et al 2018, 2020), the causality between these changes and wildfire impacts such as changes in severity remain uncertain. This is because trying to establish how SBW legacies impact fire severity causally requires a control observation to compare outcomes, and since most studies rely on historical defoliation and wildfire observational data. Identifying a control group is difficult as factors that influence fire outcomes include slope, vegetation type, or vegetation moisture. Therefore, establishing a control observation requires identifying statistically similar controls that burned under similar conditions. Fortunately, pre-processing methods such as propensity score matching are an established method for identifying such quasi-experimental controls in wildfire studies (Bustic, Woo x2 etc). Using pre-processed datasets, analysis such as linear regression can be used to predict treatment effect on fire severity.
+Fire severity is a measure of biomass and soil change used to gauge how intensely an ecosystem was impact by fire (Lentile et al 2013). A number of studies have posited that that spatial legacies of SBW defoliation will impact on wildfire effects (Cohn et al 2014; James et al. 2017). While there is evidence that supports insect-induced changes in vegetation structure prior to wildfire (Watt et al 2018, 2020), the causality between these changes and wildfire impacts such as changes in severity remain uncertain. This is because determining the causal impact of spruce budworm legacies on fire severity requires a control observation for comparison. However, most studies rely on historical defoliation and wildfire observational data. Identifying a control group is difficult as factors that influence fire outcomes include slope, vegetation type, or vegetation moisture. Therefore, establishing a control observation requires identifying statistically similar controls that burned under similar conditions. Fortunately, pre-processing methods such as propensity score matching are an established method for identifying such quasi-experimental controls in wildfire studies (Bustic, Woo x2 etc). Using pre-processed datasets, analysis such as linear regression can be used to predict average defoliation effect on wildfire severity.
 
-In observational studies, propensity score matching (PSM) is a common statistical technique applied to create a control group that is comparable in confounding variables to a treatment group in studies where treatments are unable to be randomly assigned. For each observation a propensity score (PS) is calculated which reflects the probability of receiving the treatment based on observed characteristics (i.e., potential confounders). Using PS researchers can match participants from the treatment group with those from the control group based on the similarity between scores. The degree of similarity can be selected by researchers. Referred to as the caliper, it is suggested that the degree of similar is within +/- 0.3. By simulating the conditions of a randomized controlled trial, the process of PS matching helps to balance the groups on observed characteristics, thereby reducing bias and allowing for a more accurate estimate of the treatment's impact. Using the balanced dataset, researchers are able to provide a more robust and reliable estimate of the treatment's effect.
+In observational studies, propensity score matching (PSM) is a common statistical technique applied to create a control group that is comparable in confounding variables to a treatment group in studies where treatments are unable to be randomly assigned. For each observation a propensity score (PS) is calculated which reflects the probability of receiving the treatment based on observed characteristics (i.e., potential confounders). Using propensity scores researchers can match participants from the treatment group with those from the control group based on the similarity between scores. The degree of similarity can be selected by researchers. Referred to as the caliper, it is suggested that the degree of similar is within +/- 0.3. By simulating the conditions of a randomized controlled trial, the process of PSM helps to balance the groups on observed characteristics, thereby reducing bias and allowing for a more accurate estimate of the treatment's impact. Using the balanced dataset, researchers are able to provide a more robust and reliable estimate of the treatment's effect.
 
-In this study, we aim to reduce the uncertainty surrounding the impacts of spatial legacies of SBW defoliation on wildfire in Ontario's boreal shield. We applied PSM to create a balanced control-treatment experimental design with observation data on wildfire-defoliation co-occurrences. We identified wildfires-defoliation co-occurrences between 1985-2012 using aerial-survey defoliation data and remotely sensed wildfire data. For each area, we quantified median burn severity and mean recovery magnitude. Spectral recovery trajectories were used to estimate post-fire recovery, as recent research shows they are effective and accurate at capturing post-fire structural recovery patterns in North American boreal forests (Smith‐Tripp et al 2024). Using these data, we estimated the average treatment effect (ATT) of defoliation on wildfire outcomes.
+In this study, we aim to reduce the uncertainty surrounding the causal impacts of spatial legacies of SBW defoliation on wildfire severity in Ontario's boreal shield. We applied PSM to create a balanced control-treatment experimental design with observation data on wildfire-defoliation co-occurrences. We identified wildfires-defoliation co-occurrences between 1985-2012 using aerial-survey defoliation data and remotely sensed wildfire data. For each area, we quantified median burn severity and mean recovery magnitude. Spectral recovery trajectories were used to estimate post-fire recovery, as recent research shows they are effective and accurate at capturing post-fire structural recovery patterns in North American boreal forests (Smith‐Tripp et al 2024). Using these data, we estimated the average treatment effect (ATT) of defoliation on wildfire outcomes.
 
 ## Question
 
@@ -317,11 +332,17 @@ We extracted the fitted NBR data using the Google Earth Engine implementation of
 
 Using the NBR time series, we calculated percent recovery magnitude and the relativized burn ration (RBR) for each pixel in the series. Recovery magnitude, which is the percent recovery of NBR 10 years after the fire, is calculated by dividing the NBR of the final year in the time series by the difference between the NBR for the year before the fire and the NBR for the year of the fire, multiplied by 100 (Fig S1). The relativized burn ratio (RBR) is a Landsat-based metric that captures changes in forest cover following a fire relative to pre-fire vegetation. RBR is more robust than other Landsat-based measures (e.g., RdNBR) because it is more sensitive to pre-fire values when vegetation cover is low (Parks et al 2014b). RBR is calculated by dividing the dNBR by the pre-fire NBR value (see Supplementary Materials for the equation). In this calculation we also included an offset..
 
-### Climate and fire weather data
+### Fire weather data
 
 To quantify the effect of fire weather on burn severity we used fire weather indices from the Canadian Forest Fire Weather Index (FWI) System (Van Wagner 1987). The FWI system is part of the foundation of Canada's wildfire risk assessment and used operationally by forest managers to effectively predict and evaluate wildfire danger both in Canada and globally. The FWI system is a weather-based system that outputs six indices that are numeric ratings which represent daily fuel moisture and fire behaviour potential. Fine fuel moisture code (FFMC) captures the moisture content of litter fuels. Duff moisture code (DMC) captures the moisture content of loosely compacted organic layers. Drought code (DC) captures the average moisture content of deep organic layers. Initial spread Index (ISI) represents the expected rate of fire spread. Build-up index (BUI) represents the total amount of fuel available to burn. Fire weather index (FWI), which combines ISI and BUI, provides a measure of potential fire intensity. These FWI metrics have been used previously to successfully model wildfire severity in the boreal forest (Whitman et al 2018, San‐Miguel et al 2020, Talucci et al 2022).
 
 Daily fire weather is a strong top-down drive of burn severity (Whitman et al 2018). Because the FWI system represents daily fuel moisture and fire potential, and our measure of burn severity is a single value taken at the end of the fire duration, day-to-day variation over the course of the fire may influence burn severity. To control for this variation in daily fire weather, we calculated the 90th percentile of all indices over the known duration of the fire. This method allows us to capture only extreme FWI events, which have the most influence on wildfire burn severity (Whitman et al 2018). Daily FWI values were interpolated using thin-plate splines to the centroid of each fire perimeter from weather stations across our study region from the day of the year that the fire started burning to the reported fire out date. Because weather station data was only available from 1990 onwards, we focused on fires that burned between 1990.
+
+### Climate data
+
+To quantify the effect of climate on vegetation growth during the 10-year period of post-fire recovery, we calculated mean temperature and precipitation for the growing season for the entire 10-year post-fire recovery period. For each fire, we determined the start and end of the growing season using growing degree days. Growing degree days (GDD) are a common approach to determine growing season length in the boreal shield (CITE). Start of the growing season was determined as 5 consecutive days where GDD \< 5°C after April 31. Likewise, end of the growing season was determined as 5 consecutive days where GDD \>5°C after August 31.
+
+Following
 
 ### Forest Composition
 
@@ -351,7 +372,7 @@ knitr::kable(ss2,  align = "c") %>%
 
 ```
 
-We used the MatchIt package in R (Ho et al. 2011) to match the treatment fires (defoliated) with control fires (non-defoliated) with the most similar covariate values. Initially, we conducted propensity score martching (PSM) on the entire dataset. The covariates we matched on in the model were weather, topography, spatial and environmental covariates **(TABLE)**. We estimated propensity scores using a generalized linear model with a probit link function. We used nearest neighbor matching with a caliper of 0.10 to ensure that matched pairs had similar propensity scores. Our target estimate was the average treatment effect in the treated (defoliated) fires (ATT). We estimated propensity scores using a generalized linear model with a probit link function. We used nearest neighbor matching with a caliper of 0.10 to ensure that matched pairs had similar propensity scores. Our target estimate was the average treatment effect in the treated (defoliated) fires (ATT). We assessed covariate balance before and after matching using the love plots of the standardized mean difference (SMD) @fig-asmd, and density plots of all covariates @fig-density-cov using the cobalt package (Greifer, 2023). SMD represents the mean difference between treatment and control units and we considered a threshold of \< 0.25 as an indication of acceptable covariate balance (Stuart et al., 2013). Our final sample sizes after matching were 165 treated and control units respectively @fig-study-area-2 B).
+We used the MatchIt package in R (Ho et al. 2011) to match the treatment fires (defoliated) with control fires (non-defoliated) with the most similar covariate values. Initially, we conducted propensity score martching (PSM) on the entire dataset. The covariates we matched on in the model were weather, topography, spatial and environmental covariates **(TABLE)**. We estimated propensity scores using a generalized linear model with a probit link function. We used nearest neighbor matching with a caliper of 0.10 to ensure that matched pairs had similar propensity scores. Our target estimate was the average treatment effect in the treated (defoliated) fires (ATT). We estimated propensity scores using a generalized linear model with a probit link function. We used nearest neighbor matching with a caliper of 0.10 to ensure that matched pairs had similar propensity scores. Our target estimate was the average treatment effect in the treated (defoliated) fires (ATT). We estimated the treatment effect using g-computation with a cluster-robust standard error to account for pair membership within `marginaleffects` package in `R`. We assessed covariate balance before and after matching using the love plots of the standardized mean difference (SMD) @fig-asmd, and density plots of all covariates @fig-density-cov using the cobalt package (Greifer, 2023). SMD represents the mean difference between treatment and control units and we considered a threshold of \< 0.25 as an indication of acceptable covariate balance (Stuart et al., 2013). Our final sample sizes after matching were 165 treated and control units respectively @fig-study-area-2 B).
 
 ```{r, echo=FALSE}
 #| fig-cap: Comparison of covariate balance using covariate means for treatment and control units before matching (orange) and after matching (red) to assess whether matching has improved balance. Mean values < 0.25 are considered acceptable covariate balance, dotted line represents 0.1. 
@@ -528,6 +549,7 @@ fit_att <- as.data.frame(marginaleffects::avg_comparisons(fit,
                 newdata = subset(history == 1))) %>% 
   mutate(Fires= "all")
 
+fit_att
 ```
 
 ```{r}
@@ -668,7 +690,7 @@ fit.w3_att <- as.data.frame(marginaleffects::avg_comparisons(fit.w3,
 #| warning: false
 #| message: false
 #| echo: false
-#| label: subgroup-plot
+#| label: fig-subgroup-plot
 #| fig-cap: Average treatment effect (ATT) estimates and their lower (2.5%) and upper (97.5%) confidence intervals for the effects of defoliation for entire dataset (all) and across all levels of time since defoliation.
 
 att_comparison <- rbind(fit_att, fit.w1_att, fit.w2_att, fit.w3_att)
@@ -689,6 +711,26 @@ ggplot(att_comparison, aes(x = Fires, y = estimate)) +
   
   
   
+```
+
+```{r}
+#| echo: false
+#| label: tbl-att-summary
+#| tbl-cap: Average defoliation effect on Burn Severity based on defolation status (window of opportunity)
+options(scipen = 999)
+att_comparison %>% 
+  relocate(Fires, .before = term) %>% 
+  rename(Subgroup = Fires) %>%  
+  mutate(conf.low = round(conf.low, 2),
+         conf.high = round(conf.high, 2)) %>% 
+  mutate(`95% CI` = paste(conf.low, conf.high, sep = ", ")) %>% 
+  select(c(Subgroup, estimate, std.error, `95% CI`, statistic, p.value)) %>% 
+  rename(`p` = `p.value` ) %>% 
+  rename("se ± " = "std.error") %>% 
+  mutate(p = if_else(`p` < 0.0001, "< 0.0001", as.character(`p`)))%>% 
+  mutate(across(where(is.numeric), round, 2)) %>% 
+  knitr::kable(.,  align = "l") %>%
+  kableExtra::kable_styling(position = "left" )
 ```
 
 ```{r}
@@ -791,6 +833,12 @@ ggplot() +
   labs(title = NULL, x = "Longitude", y = "Latitude", color = "Residuals") +
   theme_bw()
 ```
+
+### Results
+
+*Defoliation impacts on burn severity*
+
+We analyzed the impact of defoliation on burn severity by comparing 330 fires (165 defoliated and 165 non-defoliated) that occurred in the boreal shield of Ontario from 1990 to 2012. We found that fires with a history of defoliation had higher burn severity than fires without a history of defoliation. These results indicate that having a history of defoliation has a significant positive effect on the outcome, with an average effect size of 55.49 @tbl-att-summary . When comparing the impacts of defoliation according to different levels of time since defoliation following the "window of opportunity" described by Fleming et al. (2002), the overall average effect (55.50) is lower than the subgroup effects, highlighting that the burn severity is more pronounced when considering specific time frames post-defoliation. Additionally, our results indicate that the impact of defoliation on burn severity is not only immediate but also increases over time @fig-subgroup-plot . The average effect size grows from 73.21 in the first 2 years to 114.11 after 10 years @tbl-att-summary .
 
 ### Host species percentage
 
