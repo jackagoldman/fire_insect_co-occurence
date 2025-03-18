@@ -248,10 +248,29 @@ gls_pvalues_to_kable <- function(model_gls) {
   summary_gls <- summary(model_gls)
   
   # Extract the p-value table
-  p_values <- summary_gls$tTable %>%
-    as.data.frame() %>%
+  p_values <-summary_gls$tTable %>%
+    as.data.frame() %>% 
     select(c(Value, Std.Error ,`t-value` ,`p-value`)) %>% 
-    rename(P = `p-value`)
+    rename(p = `p-value`) %>% 
+    rownames_to_column(., var = "Covariates") %>% 
+    rename("se ± " = "Std.Error") %>%
+    rename(estimate = Value) %>% 
+    mutate(Covariates = recode(Covariates, "host_pct" = "Host %" , 
+                               "isi_90"= "Initial Spread Index",
+                               "dc_90"="Drought Code" ,
+                               "dmc_90" = "Duff Moisture Code",
+                               "ffmc_90" = "Fine Fuel Moisture Code",
+                               "bui_90" = "Build Up Index",
+                               "fwi_90" = "Fire Weather Index",
+                               "x" = "Longitude",
+                               "y" = "Latitude",
+                               "Cumulative_Years_Defol:window_opp1" = "Years Defoliated × 0-2 Years Since Defoliation",
+                               "Cumulative_Years_Defol:window_opp2" = "Years Defoliated × 3-10 Years Since Defoliation",
+                               "Cumulative_Years_Defol:window_opp3" = "Years Defoliated × 10-15 Years Since Defoliation")) %>% 
+    mutate(`s` = sapply(p, add_significance_stars)) %>% 
+    mutate(across(where(is.numeric), round, 2)) %>% 
+    mutate(p = if_else(`p` < 0.0001, "< 0.0001", as.character(`p`))) %>% 
+    rename(" " = s)
   
   # Convert the p-value table to a kable object
   kable(p_values)
