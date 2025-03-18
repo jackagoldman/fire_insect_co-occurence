@@ -149,11 +149,11 @@ In this study, we aim to reduce the uncertainty surrounding the causal impacts o
 
 ## Question
 
-How does defoliation influence **(a) burn severity** and **(b) recovery magnitude**
+How does the spatial legacies of defoliated areas affect **(a) burn severity** and **(b) recovery magnitude?**
 
-Furthermore, we examine whether the average treatment effect is different at the three separate time periods after SBW defoliation outlined by Fleming et al. (2002)
+Are there hotspots where defoliation has a more pronounced effect?
 
-Within defoliated fires, what are the dominant drivers of burn severity?
+-   Are there other factors that interact with defoliation to influence spatial patterns of burn severity in defoliated areas?
 
 ## Methods
 
@@ -746,9 +746,9 @@ knitr::kable(subgroup_modstruct,  align = "l") %>%
 
 ```
 
-#### Drivers of burn severity within defoliated fires
+#### Spatial patterns of burn severity in defoliated fires
 
-Under extreme fire weather conditions the effects of fuels are less impactful and their effects do not emerge from models of wildfire behavior (Podur et al 2009). However, based on a priori expectations, the effects of fuels should be apparent in fires with a history of defoliation (James et al. 2017), and we might expect severity to increase commensurately with time since defoliation. Therefore, we examined the drivers of burn severity within the subset of fires that had a history of defoliation (n = 256). We modeled burn severity as a function of host percentage, cumulative years of defoliation, time since defoliation, and several fire weather indices. Time since defoliation was modeled as a factor with 3 levels corresponding to three windows of opportunity. We included an interaction between cumulative years of defoliation and time since defoliation, as we predict defoliation recurring in successive years will amplify the impacts of defoliation history depending on the time since defoliation. We fit a generalized least squares (GLS) model with a Gaussian spatial correlation structure, where correlation decreases with distance. Model fit was assessed by plotting residuals against fitted values (Appendix 1), and indicated a good fit with residuals centered around zero. To assess spatial autocorrelation, a variogram of the residuals was computed (Appendix 1) and plotted the spatial distribution of the model residuals @fig-spatial-residuals.
+Based on *a priori* expectations of east-west variations in vegetation type, composition, and climate, we examined the spatial patterns of burn severity for fires with a history of defoliation (n = 256). We modeled burn severity as a function of host percentage, cumulative years of defoliation, time since defoliation, and several fire weather indices. Time since defoliation was modeled as a factor with 3 levels corresponding to three windows of opportunity. We included an interaction between cumulative years of defoliation and time since defoliation, as we predict areas where defoliated occurred in successive years will have greater burn severity due to increase fuel loads. Therefore we would expect the interaction between cumulative years of defoliation and time since defoliation to reveal hotspots with a high degree of burn severity. We fit a generalized least squares (GLS) model with a Gaussian spatial correlation structure, where correlation decreases with distance. Model fit was assessed by plotting residuals against fitted values (Appendix 1), and indicated a good fit with residuals centered around zero. To assess spatial autocorrelation, a variogram of the residuals was computed (Appendix 1) and plotted the spatial distribution of the model residuals @fig-spatial-residuals.
 
 ```{r}
 #| echo: false
@@ -812,7 +812,7 @@ var_plot <- plot(variogram_gls, main = "Variogram of Residuals (Gaussian)")
 # confirm defol_only as dataframe
 df <- as.data.frame(defol_only)
 
-gls_pvalues_to_kable(model_gls)
+
 
 ```
 
@@ -838,7 +838,27 @@ ggplot() +
 
 *Defoliation effect estimate on burn severity*
 
-We analyzed the impact of defoliation on burn severity by comparing 330 fires (165 defoliated and 165 non-defoliated) that occurred in the boreal shield of Ontario from 1990 to 2012. We found that fires with a history of defoliation had higher burn severity than fires without a history of defoliation. These results indicate that having a history of defoliation has a significant positive effect on the outcome, with an average effect size of 55.49 @tbl-att-summary . When comparing the impacts of defoliation according to different levels of time since defoliation following the "window of opportunity" described by Fleming et al. (2002), the overall average effect (55.50) is lower than the subgroup effects, highlighting that the burn severity is more pronounced when considering specific time frames post-defoliation. Additionally, our results indicate that the impact of defoliation on burn severity is not only immediate but also increases over time @fig-subgroup-plot . The average effect size grows from 73.21 in the first 2 years to 114.11 after 10 years @tbl-att-summary .
+We analyzed the impact of defoliation on burn severity by comparing 330 fires (165 defoliated and 165 non-defoliated) that occurred in the boreal shield of Ontario from 1990 to 2012. We found that fires with a history of defoliation had higher burn severity than fires without a history of defoliation. These results indicate that having a history of defoliation has a significant positive effect on the outcome, with an average effect size of 55.49 [@tbl-att-summary]. When comparing the impacts of defoliation according to different levels of time since defoliation following the "window of opportunity" described by Fleming et al. (2002), the overall average effect (55.50) is lower than the subgroup effects, highlighting that the burn severity is more pronounced when considering specific time frames post-defoliation. Additionally, our results indicate that the impact of defoliation on burn severity is not only immediate but also increases over time [@fig-subgroup-plot]. The average effect size grows from 73.21 in the first 2 years to 114.11 after 10 years [@tbl-att-summary].
+
+*Spatial patterns of burn severity*
+
+We assessed the spatial distribution of burn severity of all 256 defoliated fires that burned in the boreal shield of Ontario from 1990 to 2012 using a GLS model with a Gaussian correlation structure which incorporated the effects of defoliation and climate variables. The spatial correlation structure indicates a range parameter estimate of 0.0444, suggesting a relatively short spatial correlation range (Appendix 1) \[@fig-spatial-residuals\]. This implies that spatial autocorrelation is present but diminishes quickly over distance. The spatial distribution of model residuals [@fig-spatial-residuals], reveals no obvious patterns of burn severity from east-to-west. We found that the significant predictors identified in the model, such as the percentage of host species (host %), Initial Spread Index, and interaction between cumulative years defoliated and time since defoliation (10-15 years) \[@tbl-gls-severity\], remain influential even after accounting for spatial autocorrelation. Percentage of host species (Host %) was found to have a significant negative effect on burn severity, indicating that higher percentages of host species within a fire are associated with lower burn severity [@tbl-gls-severity]. Initial spread Index showed a significant positive effect on burn severity, suggesting under conditions favouring a higher rate of spread we observed an increased burn severity [@tbl-gls-severity]. Among the defoliation variables, the interaction term cumulative years defoliated and time since defoliation (10-15 years) was significant, and implies that areas defoliated for 10-15 years exhibit higher burn severity compared to other periods. While all other variables did not show a significant impact on burn severity.
+
+```{r}
+#| tbl-cap: "Results from Generalized Least Squares (GLS) model with Gaussian correlation structure assessing the effects of defoliation and climate covariates on burn severity, accounting for spatial autocorrelation in residuals."
+#| label: tbl-gls-severity
+#| echo: false
+#| warning: false
+gls_pvalues_to_kable(model_gls)
+```
+
+### Discussion
+
+### Conclusion
+
+These findings highlight the critical roles of host presence, initial spread conditions, and long-term defoliation in influencing burn severity. The model underscores the importance of considering both biotic and abiotic factors, as well as their interactions, in understanding and predicting burn severity in forested landscapes.
+
+Overall, the model effectively captures the spatial distribution of burn severity, highlighting the importance of considering spatial autocorrelation in ecological studies.
 
 ### Host species percentage
 
