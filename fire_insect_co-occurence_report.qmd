@@ -53,14 +53,24 @@ recovery_defol = read.csv("/home/goldma34/fire_insect_co-occurence/data/outputs/
 
 recovery_non_defol = read.csv("/home/goldma34/fire_insect_co-occurence/data/outputs/no_history/on_no_history_recovery_magnitude.csv")
 
+# read in climate post
+post_climate_no_history = read.csv("/home/goldma34/fire_insect_co-occurence/data/outputs/no_history/on_no_history_final_era5_clim.csv")
+
+post_climate_history = read.csv("/home/goldma34/fire_insect_co-occurence/data/outputs/on/on_history_final_era5_clim.csv")
+
 # merge recovery dataframes
 recovery <- rbind(recovery_defol, recovery_non_defol) %>% 
   select(-c("X")) %>% 
   rename(recovery = Average.Recovery)
 
+# merge post climate dataframes
+post_climate = rbind(post_climate_history, post_climate_no_history) 
+
 # join recovery to history
 history <- history %>% 
   left_join(recovery, by = "Fire_ID")
+
+
 
 # join fire centroids to history
 history <- history %>% 
@@ -141,11 +151,59 @@ m.data.sf <- st_as_sf(m.data, coords = c("x", "y"), crs = 4326)
 
 ## Background
 
+In 2023, Canada experienced its most severe wildfire season on record, with 18.6 million hectares of forest burned. This, coupled with projected increases in the frequency and severity of outbreaks due to climate warming (Régnière et al 2012, Bouchard et al 2018, Weed et al 2013), raises concerns about the influence of these large-scale spatial legacies on wildfire behavior (Stocks 1987, Candau et al 2018, Fettig et al 2022). Adding to this concern is the climate-induced transition of black spruce from non-host to host species (Pureswaran et al 2019). Black spruce is the most widespread conifer in the eastern boreal forest. They are also considered to be the most flammable due to their resinous needles and their dense, low-lying branches that can easily catch fire and promote vertical spread of ground fires to high-severity canopy fires (Barrett et al 2010, Massey et al 2023).
+
+Spruce budworm (SBW) defoliation significantly alters forest structure and the distribution and connectivity of combustible fuels across large areas. Vertical fuel continuity, which refers to the vertical distribution of fuels within a forest stand , increases with consecutive years of defoliation (Watt et al 2018). These vertical fuels, often called ladder fuels, facilitate the transition of surface fires to high-severity canopy fires (Van Wagner 1977). Additionally, surface fuel abundance increases by 145% in the years following outbreaks (Watt et al 2020).
+
+Since the distribution of available fuel is a key driver of wildfire regimes, insect outbreaks are expected to have a strong bottom-up effect on wildfires (McCullough et al 1998). However, the cumulative effects of insect defoliation and subsequent natural disturbances, such as wildfire (James et al 2017), wind (Sturtevant et al 2014) and herbivory (Leroux et al 2021), often lead to non-linear responses that alter ecosystems in novel ways (Buma 2015). These non-linear responses contribute to the diversity of observed outcomes in past studies, and makes it challenging to disentangle how insect defoliation influences the emergent properties of subsequent disturbances.
+
+Emergent properties of disturbance interactions are often categorized as additive, synergistic, or antagonistic (Sturtevant and Fortin 2021). It is plausible that SBW defoliation could alter wildfire behavior in ways that result in any of these interactions, depending on the severity of defoliation and its spatial or temporal legacies. However, few studies have empirically demonstrated these interactions.
+
+Some research indicated that the spatial legacies of spruce budworm outbreaks increase fire risk (additive interaction) in Ontario (Stocks 1987, Fleming et al 2002a, James et al 2007) but decrease fire risk and severity (antagonistic interaction) in western North America (Lynch and Moorcroft 2008, Flower et al 2014). Additionally, the synergistic effects of defoliation on wildfire risk are limited to a specific time lag following defoliation. Outside of this "window of opportunity" of 8-10 years, the interaction may become antagonistic (James et al 2017, Fleming et al 2002a).
+
+Simulations of spruce budworm outbreaks suggests the effects of fuel changes following defoliation will result in neutral or antagonistic interactions (James et al 2011, Vane et al 2017, Cohn et al 2014). Two possible scenarios contribute to the contrasting and uncertain effects of wildfire and spruce budworm interactions: (1) fires are inherently noisy systems, and (2) the rarity of insect-wildfire co-occurrence. Historical reconstructions suggests SBW outbreaks tend to occur when fire activity is low (Simard et al 2006).
+
+The occurrence of wildfires is restricted by the abundance, structure, and connectivity of fuels (Miller and Urban 2000, Agee and Skinner 2005). However, in the eastern boreal forest, wildfire likelihood is primarily controlled by the top-down effects of fire weather. Under extreme fire weather conditions, the influence of fuels becomes negligible (Podur and Martell 2009). Therefore, it is possible that wildfire likelihood following defoliation is more influenced by weather than by forest fuels. James et al. (2017) supported this assertion by controlling for the variation explained by weather before modeling the effects of budworm legacies, thereby isolating the impact of SBW fuels on the likelihood of ignition. This highlights the challenge of disentangling clear cause-and-effect relationships given the significant role of weather and its interaction with fuels.
+
+Fuel, rather than fire weather and climate, is the most critical factor influencing wildfire burn severity (Parks et al 2014a, 2018). Burn severity, which refers to the ecological impact of fire on vegetation and soil, is a key component of fire regimes. The level of burn severity determines how long and how well an ecosystem can recover to its pre-disturbed state (Bright et al 2019).
+
+Interestingly, there is evidence that western spruce budworm (Choristoneura freeman) can reduce subsequent burn severity in the US Pacific Northwest (Meigs et al 2016). This reduction in severity is likely due to the forest recovery following budworm outbreaks, which often leads to the establishment and regeneration of nonhost species, such as broadleaf trees (Bouchard et al 2006). These species have higher moisture content and lower flammability (Parisien et al 2023).
+
+Since burn severity is crucial for ecosystem recovery, it is essential to consider both recovery and burn severity together. The non-linear impacts from disturbance interactions may not be immediately apparent after a fire. Currently, no studies have explicitly investigated the influence of eastern spruce budworm legacies on wildfire burn severity in the eastern boreal forest. The cumulative effects of insect outbreaks and wildfires on post-fire recovery remain uncertain.
+
+\--
+
+Insect defoliation is the most widespread natural disturbance agent in the eastern boreal forest, affecting more forest area than any other disturbance (McCullough et al 1998, Volney and Fleming 2000). The eastern spruce budworm (Choristoneura fumiferana Clemens) causes the most extensive damage among insect defoliators due to the large scale and high severity of its outbreaks (Navarro et al 2018). Native to North American coniferous forests, the primary hosts of the eastern spruce budworm (SBW) are balsam fir (Abies balsamea), which spruce (Picea glauca), and increasingly black spruce (Picea mariana) due to climate warming-induced phenological synchrony (Pureswaran et al 2019).
+
+SBW defoliation can lead to mortality if it continues for three or more consecutive years. However, more commonly, it results in crown and branch mortality and reduced growth in balsam fir and secondary hosts (MacLean 1984, Bergeron et al 1995, Nealis and Régnière 2004, Bouchard et al 2005). The long-term effects of SBW defoliation on vegetation dynamics are exacerbated by climate warming (Subedi et al 2023). The spatial legacies of SBW outbreaks can create landscape heterogeneity in vegetation patterns that can persist for decades, influencing the likelihood and severity of future disturbances (Taylor and MacLean 2009, James et al 2017).
+
 Fire severity is a measure of biomass and soil change used to gauge how intensely an ecosystem was impact by fire (Lentile et al 2013). A number of studies have posited that that spatial legacies of SBW defoliation will impact on wildfire effects (Cohn et al 2014; James et al. 2017). While there is evidence that supports insect-induced changes in vegetation structure prior to wildfire (Watt et al 2018, 2020), the causality between these changes and wildfire impacts such as changes in severity remain uncertain. This is because determining the causal impact of spruce budworm legacies on fire severity requires a control observation for comparison. However, most studies rely on historical defoliation and wildfire observational data. Identifying a control group is difficult as factors that influence fire outcomes include slope, vegetation type, or vegetation moisture. Therefore, establishing a control observation requires identifying statistically similar controls that burned under similar conditions. Fortunately, pre-processing methods such as propensity score matching are an established method for identifying such quasi-experimental controls in wildfire studies (Bustic, Woo x2 etc). Using pre-processed datasets, analysis such as linear regression can be used to predict average defoliation effect on wildfire severity.
 
 In observational studies, propensity score matching (PSM) is a common statistical technique applied to create a control group that is comparable in confounding variables to a treatment group in studies where treatments are unable to be randomly assigned. For each observation a propensity score (PS) is calculated which reflects the probability of receiving the treatment based on observed characteristics (i.e., potential confounders). Using propensity scores researchers can match participants from the treatment group with those from the control group based on the similarity between scores. The degree of similarity can be selected by researchers. Referred to as the caliper, it is suggested that the degree of similar is within +/- 0.3. By simulating the conditions of a randomized controlled trial, the process of PSM helps to balance the groups on observed characteristics, thereby reducing bias and allowing for a more accurate estimate of the treatment's impact. Using the balanced dataset, researchers are able to provide a more robust and reliable estimate of the treatment's effect.
 
 In this study, we aim to reduce the uncertainty surrounding the causal impacts of spatial legacies of SBW defoliation on wildfire severity in Ontario's boreal shield. We applied PSM to create a balanced control-treatment experimental design with observation data on wildfire-defoliation co-occurrences. We identified wildfires-defoliation co-occurrences between 1985-2012 using aerial-survey defoliation data and remotely sensed wildfire data. For each area, we quantified median burn severity and mean recovery magnitude. Spectral recovery trajectories were used to estimate post-fire recovery, as recent research shows they are effective and accurate at capturing post-fire structural recovery patterns in North American boreal forests (Smith‐Tripp et al 2024). Using these data, we estimated the average treatment effect (ATT) of defoliation on wildfire outcomes.
+
+Goals:
+
+-   Present the problem and the proposed solution
+
+-   Presents nature and scope of the problem investigated
+
+-   Reviews the pertinent literature to orient the reader
+
+-   States the method of the experiment
+
+-   State the principle results of the experiment
+
+Checklist
+
+-   Indicate the field of the work, why this field is important, and what has already been done (with proper citations).
+
+-   Indicate a gap, raise a research question, or challenge prior work in this territory.
+
+-   Outline the purpose and announce the present research, clearly indicating what is novel and why it is significant.
+
+-   Avoid: repeating the abstract; providing unnecessary background information; exaggerating the importance of the work; claiming novelty without a proper literature search. 
 
 ## Question
 
@@ -842,7 +900,7 @@ We analyzed the impact of defoliation on burn severity by comparing 330 fires (1
 
 *Spatial patterns of burn severity*
 
-We assessed the spatial distribution of burn severity of all 256 defoliated fires that burned in the boreal shield of Ontario from 1990 to 2012 using a GLS model with a Gaussian correlation structure which incorporated the effects of defoliation and climate variables. The spatial correlation structure indicates a range parameter estimate of 0.0444, suggesting a relatively short spatial correlation range (Appendix 1) \[@fig-spatial-residuals\]. This implies that spatial autocorrelation is present but diminishes quickly over distance. The spatial distribution of model residuals [@fig-spatial-residuals], reveals no obvious patterns of burn severity from east-to-west. We found that the significant predictors identified in the model, such as the percentage of host species (host %), Initial Spread Index, and interaction between cumulative years defoliated and time since defoliation (10-15 years) \[@tbl-gls-severity\], remain influential even after accounting for spatial autocorrelation. Percentage of host species (Host %) was found to have a significant negative effect on burn severity, indicating that higher percentages of host species within a fire are associated with lower burn severity [@tbl-gls-severity]. Initial spread Index showed a significant positive effect on burn severity, suggesting under conditions favouring a higher rate of spread we observed an increased burn severity [@tbl-gls-severity]. Among the defoliation variables, the interaction term cumulative years defoliated and time since defoliation (10-15 years) was significant, and implies that areas defoliated for 10-15 years exhibit higher burn severity compared to other periods. While all other variables did not show a significant impact on burn severity.
+We assessed the spatial distribution of burn severity of all 256 defoliated fires that burned in the boreal shield of Ontario from 1990 to 2012 using a GLS model with a Gaussian correlation structure which incorporated the effects of defoliation and climate variables. The spatial correlation structure indicates a range parameter estimate of 0.0444, suggesting a relatively short spatial correlation range (Appendix 1) [@fig-spatial-residuals]. This implies that spatial autocorrelation is present but diminishes quickly over distance. The spatial distribution of model residuals [@fig-spatial-residuals], reveals no obvious patterns of burn severity from east-to-west. We found that the significant predictors identified in the model, such as the percentage of host species (host %), Initial Spread Index, and interaction between cumulative years defoliated and time since defoliation (10-15 years) [@tbl-gls-severity], remain influential even after accounting for spatial autocorrelation. Percentage of host species (Host %) was found to have a significant negative effect on burn severity, indicating that higher percentages of host species within a fire are associated with lower burn severity [@tbl-gls-severity]. Initial spread Index showed a significant positive effect on burn severity, suggesting under conditions favouring a higher rate of spread we observed an increased burn severity [@tbl-gls-severity]. Among the defoliation variables, the interaction term cumulative years defoliated and time since defoliation (10-15 years) was significant, and implies that areas defoliated for 10-15 years exhibit higher burn severity compared to other periods. While all other variables did not show a significant impact on burn severity.
 
 ```{r}
 #| tbl-cap: "Results from Generalized Least Squares (GLS) model with Gaussian correlation structure assessing the effects of defoliation and climate covariates on burn severity, accounting for spatial autocorrelation in residuals."
@@ -854,7 +912,47 @@ gls_pvalues_to_kable(model_gls)
 
 ### Discussion
 
+Our findings highlight the important role of spatial legacies of spruce budworm defoliation on exacerbating the impacts of wildfire on post-fire biomass and soil change (burn severity) and recovery capacity and reveal variability in the impactfulness of spatial legacies based on the amount, and duration of defoliation and time since defoliation. Our resutls
+
+Goals:
+
+-   Present principles, relationships and generalizations shown by the results
+
+-   Point out exceptions or lack of correlations. Define why you think this is so.
+
+-   Show how your results agree or disagree with previously published works
+
+-   Discuss the theoretical implications of your work as well as practical applications
+
+-   State your conclusions clearly. Summarize your evidence for each conclusion.
+
+-   Discuss the significance of the results
+
+checklist
+
+-   Evidence does not explain itself; the results must be presented and then explained.
+
+-   Typical stages in the discussion: summarizing the results, discussing whether results are expected or unexpected, comparing these results to previous work, interpreting and explaining the results (often by comparison to a theory or model), and hypothesizing about their generality.
+
+-   Discuss any problems or shortcomings encountered during the course of the work.
+
+-   Discuss possible alternate explanations for the results.
+
+-   Avoid: presenting results that are never discussed; presenting discussion that does not relate to any of the results; presenting results and discussion in chronological order rather than logical order; ignoring results that do not support the conclusions; drawing conclusions from results without logical arguments to back them up. 
+
 ### Conclusion
+
+checklist
+
+-   Provide a very brief summary of the Results and Discussion.
+
+-   Emphasize the implications of the findings, explaining how the work is significant and providing the key message(s) the author wishes to convey.
+
+-   Provide the most general claims that can be supported by the evidence.
+
+-   Provide a future perspective on the work.
+
+-   Avoid: repeating the abstract; repeating background information from the Introduction; introducing new evidence or new arguments not found in the Results and Discussion; repeating the arguments made in the Results and Discussion; failing to address all of the research questions set out in the Introduction. 
 
 These findings highlight the critical roles of host presence, initial spread conditions, and long-term defoliation in influencing burn severity. The model underscores the importance of considering both biotic and abiotic factors, as well as their interactions, in understanding and predicting burn severity in forested landscapes.
 
