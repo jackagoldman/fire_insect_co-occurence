@@ -54,9 +54,11 @@ recovery_defol = read.csv("/home/goldma34/fire_insect_co-occurence/data/outputs/
 recovery_non_defol = read.csv("/home/goldma34/fire_insect_co-occurence/data/outputs/no_history/on_no_history_recovery_magnitude.csv")
 
 # read in climate post
-post_climate_no_history = read.csv("/home/goldma34/fire_insect_co-occurence/data/outputs/no_history/on_no_history_final_era5_clim.csv")
+post_climate_no_history <-  read.csv("/home/goldma34/fire_insect_co-occurence/data/outputs/no_history/on_no_history_final_era5_clim.csv")
 
-post_climate_history = read.csv("/home/goldma34/fire_insect_co-occurence/data/outputs/on/on_history_final_era5_clim.csv")
+post_climate_history_1 <-  read.csv("/home/goldma34/fire_insect_co-occurence/data/outputs/on/on_history_final_era5_clim.csv")
+
+post_climate_history_2 <-  read.csv("/home/goldma34/fire_insect_co-occurence/data/outputs/on/on_history_final_era5_clim_missing.csv")
 
 # merge recovery dataframes
 recovery <- rbind(recovery_defol, recovery_non_defol) %>% 
@@ -64,13 +66,19 @@ recovery <- rbind(recovery_defol, recovery_non_defol) %>%
   rename(recovery = Average.Recovery)
 
 # merge post climate dataframes
-post_climate = rbind(post_climate_history, post_climate_no_history) 
+post_climate_history <-  rbind(post_climate_history_1, post_climate_history_2)
+
+# merge post climate dataframes
+post_climate <-  rbind(post_climate_history, post_climate_no_history) 
 
 # join recovery to history
 history <- history %>% 
   left_join(recovery, by = "Fire_ID")
 
+# join climate to history
 
+history <- history %>% 
+  left_join(post_climate, by = 'Fire_ID')
 
 # join fire centroids to history
 history <- history %>% 
@@ -114,7 +122,7 @@ hist_gt90_3 <- subset(history_gt90, window_opp == "0" | window_opp == "3")
 
 ```
 
-```{r, model, results='hide'}
+```{r, model severity, results='hide'}
 
 #| warning: false
 #| message: false
@@ -145,6 +153,39 @@ m.data %>%
 
 # Convert the data frame to an sf object
 m.data.sf <- st_as_sf(m.data, coords = c("x", "y"), crs = 4326)
+```
+
+```{r}
+
+#| warning: false
+#| message: false
+#| echo: false
+
+
+
+# Full matching on a probit PS
+m.out.rec <- matchit(history ~  host_pct + rbr_w_offset + mean_temperature + sum_precipitation_mm,
+                  data = history_gt90,
+                  method = "nearest",
+                  distance = "glm",
+                  link = "probit",
+                  m.order = "random",
+                 ### set a maximum distance for the matches
+                 caliper = 0.10)
+
+
+
+m.data.rec <- match_data(m.out.rec)
+
+
+m.data.rec %>% 
+  group_by(history) %>% 
+  summarise("Number of Fires" = n()) %>% 
+  mutate(history = case_when(history ==1 ~ "Defoliated",
+                           history ==0 ~"Non-Defoliated"))
+
+# Convert the data frame to an sf object
+m.data.rec.sf <- st_as_sf(m.data.rec, coords = c("x", "y"), crs = 4326)
 ```
 
 # Overview
@@ -597,7 +638,7 @@ knitr::kable(ss_sg,  align = "c") %>%
 #| warning: false
 #| message: false
 #| echo: false
-#| label: Average treatment effect-full mod
+#| label: Average treatment effect-full mod severity
 
 fit <- lm(rbr_w_offset  ~ history *(host_pct+ isi_90 + dc_90+ dmc_90 + ffmc_90 + bui_90 + fwi_90),  data = m.data,weights = weights)
 
@@ -608,6 +649,145 @@ fit_att <- as.data.frame(marginaleffects::avg_comparisons(fit,
   mutate(Fires= "all")
 
 fit_att
+```
+
+```{r}
+
+#| warning: false
+#| message: false
+#| echo: false
+#| label: Average treatment effect-full mod-recovery
+
+m.data.rec_test  <- m.data.rec %>% 
+  mutate(history = case_when(history == 1 ~ "Defoliated",
+                             history == 0 ~ "Non-Defoliated"))
+
+fit_rec_baseline <- lm(recovery  ~ history *(host_pct+rbr_w_offset + mean_temperature + sum_precipitation_mm),  data = m.data.rec_test,weights = weights)
+
+fit_att_rec <- as.data.frame(marginaleffects::avg_comparisons(fit_rec_baseline,
+                variables = "history",
+                vcov = ~subclass,
+                newdata = subset(history == "Defoliated"))) %>% 
+  mutate(Fires= "all")
+
+p <- marginaleffects::plot_predictions(fit_rec_baseline, condition = c("history"), draw = FALSE) 
+
+ggplot(p, aes(x = history, y = estimate, color = history)) +
+  geom_point(size = 4) +
+  geom_errorbar(aes(ymin = conf.low, ymax = conf.high), width = 0.2) +
+  labs(y = "Recovery Magnitude (%)", x = "Defoliation History", color = "History") +
+  scale_x_discrete(labels = c("Non-Defoliated", "Defoliated")) +
+  scale_color_manual(values = c("Defoliated" = "#FF8C00A0", "Non-Defoliated" = "#8B0000A0")) +
+  theme_bw()+
+  theme(legend.position = "none")
+```
+
+```{r}
+#| warning: false
+#| message: false
+#| echo: false
+#| label: recovery-subgroup-matched-data-tsd1
+
+best_model_info_recovery <- find_best_model(hist_gt90_1, "recovery", methods, distances, links, m_orders, calipers, replace_list, use_mahvars_list)
+best_model_1_recovery <- best_model_info_recovery$best_model
+all_results_recovery <- best_model_info_recovery$results
+
+m.data.rec.w1 <- match_data(best_model_1_recovery)
+
+m.data.rec.w1  <- m.data.rec.w1 %>% 
+  mutate(history = case_when(history == 1 ~ "Defoliated",
+                             history == 0 ~ "Non-Defoliated"))
+
+fit.rec.w1 <- lm(recovery  ~ history *(host_pct+rbr_w_offset + mean_temperature + sum_precipitation_mm),  data = m.data.rec.w1,weights = weights)
+
+att.rec.w1 <- as.data.frame(marginaleffects::avg_comparisons(fit.rec.w1,
+                variables = "history",
+                vcov = ~subclass,
+                newdata = subset(history == "Defoliated"))) %>% 
+  mutate(Fires= "0-2 years defoliated")
+
+p <- marginaleffects::plot_predictions(fit.rec.w1, condition = c("history"), draw = FALSE) 
+
+ggplot(p, aes(x = history, y = estimate, color = history)) +
+  geom_point(size = 4) +
+  geom_errorbar(aes(ymin = conf.low, ymax = conf.high), width = 0.2) +
+  labs(y = "Recovery Magnitude (%)", x = "Defoliation History", color = "History") +
+  scale_x_discrete(labels = c("Non-Defoliated", "Defoliated")) +
+  scale_color_manual(values = c("Defoliated" = "#FF8C00A0", "Non-Defoliated" = "#8B0000A0")) +
+  theme_bw()+
+  theme(legend.position = "none")
+```
+
+```{r}
+#| warning: false
+#| message: false
+#| echo: false
+#| label: recovery-subgroup-matched-data-tsd2
+
+best_model_info_recovery <- find_best_model(hist_gt90_2, "recovery", methods, distances, links, m_orders, calipers, replace_list, use_mahvars_list)
+best_model_2_recovery <- best_model_info_recovery$best_model
+all_results_recovery <- best_model_info_recovery$results
+
+m.data.rec.w2 <- match_data(best_model_2_recovery)
+
+m.data.rec.w2  <- m.data.rec.w2 %>% 
+  mutate(history = case_when(history == 1 ~ "Defoliated",
+                             history == 0 ~ "Non-Defoliated"))
+
+fit.rec.w2 <- lm(recovery  ~ history *(host_pct+rbr_w_offset + mean_temperature + sum_precipitation_mm),  data = m.data.rec.w2,weights = weights)
+
+att.rec.w2 <- as.data.frame(marginaleffects::avg_comparisons(fit.rec.w2,
+                variables = "history",
+                vcov = ~subclass,
+                newdata = subset(history == "Defoliated"))) %>% 
+  mutate(Fires= "3-9 years defoliated")
+
+p <- marginaleffects::plot_predictions(fit.rec.w2, condition = c("history"), draw = FALSE) 
+
+ggplot(p, aes(x = history, y = estimate, color = history)) +
+  geom_point(size = 4) +
+  geom_errorbar(aes(ymin = conf.low, ymax = conf.high), width = 0.2) +
+  labs(y = "Recovery Magnitude (%)", x = "Defoliation History", color = "History") +
+  scale_x_discrete(labels = c("Non-Defoliated", "Defoliated")) +
+  scale_color_manual(values = c("Defoliated" = "#FF8C00A0", "Non-Defoliated" = "#8B0000A0")) +
+  theme_bw()+
+  theme(legend.position = "none")
+```
+
+```{r}
+#| warning: false
+#| message: false
+#| echo: false
+#| label: recovery-subgroup-matched-data-tsd3
+
+best_model_info_recovery <- find_best_model(hist_gt90_3, "recovery", methods, distances, links, m_orders, calipers, replace_list, use_mahvars_list)
+best_model_3_recovery <- best_model_info_recovery$best_model
+all_results_recovery <- best_model_info_recovery$results
+
+m.data.rec.w3 <- match_data(best_model_3_recovery)
+
+m.data.rec.w3  <- m.data.rec.w3 %>% 
+  mutate(history = case_when(history == 1 ~ "Defoliated",
+                             history == 0 ~ "Non-Defoliated"))
+
+fit.rec.w3 <- lm(recovery  ~ history *(host_pct+rbr_w_offset + mean_temperature + sum_precipitation_mm),  data = m.data.rec.w3,weights = weights)
+
+att.rec.w3 <- as.data.frame(marginaleffects::avg_comparisons(fit.rec.w3,
+                variables = "history",
+                vcov = ~subclass,
+                newdata = subset(history == "Defoliated"))) %>% 
+  mutate(Fires= "3-9 years defoliated")
+
+p <- marginaleffects::plot_predictions(fit.rec.w3, condition = c("history"), draw = FALSE) 
+
+ggplot(p, aes(x = history, y = estimate, color = history)) +
+  geom_point(size = 4) +
+  geom_errorbar(aes(ymin = conf.low, ymax = conf.high), width = 0.2) +
+  labs(y = "Recovery Magnitude (%)", x = "Defoliation History", color = "History") +
+  scale_x_discrete(labels = c("Non-Defoliated", "Defoliated")) +
+  scale_color_manual(values = c("Defoliated" = "#FF8C00A0", "Non-Defoliated" = "#8B0000A0")) +
+  theme_bw()+
+  theme(legend.position = "none")
 ```
 
 ```{r}
@@ -633,7 +813,7 @@ use_mahvars_list <- c(FALSE, TRUE)
 #| echo: false
 #| label: subgroup-matched-data-tsd1
 
-best_model_info <- find_best_model(hist_gt90_1, methods, distances, links, m_orders, calipers, replace_list, use_mahvars_list)
+best_model_info <- find_best_model(hist_gt90_1, "severity",methods, distances, links, m_orders, calipers, replace_list, use_mahvars_list)
 best_model_1 <- best_model_info$best_model
 all_results <- best_model_info$results
 
@@ -654,7 +834,7 @@ m.data.w1 %>%
 #| echo: false
 #| label: subgroup-matched-data-tsd2
 
-best_model_info <- find_best_model(hist_gt90_2, methods, distances, links, m_orders, calipers, replace_list, use_mahvars_list)
+best_model_info <- find_best_model(hist_gt90_2, "severity",methods, distances, links, m_orders, calipers, replace_list, use_mahvars_list)
 best_model_2 <- best_model_info$best_model
 all_results <- best_model_info$results
 
@@ -676,7 +856,7 @@ m.data.w2 %>%
 #| echo: false
 #| label: subgroup-matched-data-tsd3
 
-best_model_info <- find_best_model(hist_gt90_3, methods, distances, links, m_orders, calipers, replace_list, use_mahvars_list)
+best_model_info <- find_best_model(hist_gt90_3, "severity", methods, distances, links, m_orders, calipers, replace_list, use_mahvars_list)
 best_model_3 <- best_model_info$best_model
 all_results <- best_model_info$results
 
@@ -804,14 +984,14 @@ knitr::kable(subgroup_modstruct,  align = "l") %>%
 
 ```
 
-#### Spatial patterns of burn severity in defoliated fires
+#### Spatial patterns of severity and recovery in defoliated fires
 
-Based on *a priori* expectations of east-west variations in vegetation type, composition, and climate, we examined the spatial patterns of burn severity for fires with a history of defoliation (n = 256). We modeled burn severity as a function of host percentage, cumulative years of defoliation, time since defoliation, and several fire weather indices. Time since defoliation was modeled as a factor with 3 levels corresponding to three windows of opportunity. We included an interaction between cumulative years of defoliation and time since defoliation, as we predict areas where defoliated occurred in successive years will have greater burn severity due to increase fuel loads. Therefore we would expect the interaction between cumulative years of defoliation and time since defoliation to reveal hotspots with a high degree of burn severity. We fit a generalized least squares (GLS) model with a Gaussian spatial correlation structure, where correlation decreases with distance. Model fit was assessed by plotting residuals against fitted values (Appendix 1), and indicated a good fit with residuals centered around zero. To assess spatial autocorrelation, a variogram of the residuals was computed (Appendix 1) and plotted the spatial distribution of the model residuals @fig-spatial-residuals.
+Based on *a priori* expectations of east-west variations in vegetation type, composition, and climate, we examined the spatial patterns of burn severity and recovery magnitude for fires with a history of defoliation (n = 256). We modeled burn severity as a function of host percentage, cumulative years of defoliation, time since defoliation, and several fire weather indices. Recovery magnitude was modeled as a function of host percentage, cumulative years of defoliation, time since defoliation, burn severity, mean tempeature and total precipitation.In each model time since defoliation was modeled as a factor with 3 levels corresponding to three windows of opportunity. We included an interaction between cumulative years of defoliation and time since defoliation, as we predict areas where defoliated occurred in successive years will have greater burn severity due to increase fuel loads, and lower recovery magnitude due to increased severity. Therefore we would expect the interaction between cumulative years of defoliation and time since defoliation to reveal hotspots with a high degree of burn severity, or low levels of recovery magnitude. We fit a generalized least squares (GLS) model with a Gaussian spatial correlation structure, where correlation decreases with distance. Model fit was assessed by plotting residuals against fitted values (Appendix 1), and indicated a good fit with residuals centered around zero. To assess spatial autocorrelation, a variogram of the residuals was computed (Appendix 1) and plotted the spatial distribution of the model residuals.
 
 ```{r}
 #| echo: false
 #| warning: false
-#| label: full model
+#| label: gls-severity-full model
 
 library(lme4)
 library(MuMIn)
@@ -875,7 +1055,7 @@ df <- as.data.frame(defol_only)
 ```
 
 ```{r}
-#| label: fig-spatial-residuals
+#| label: fig-spatial-residuals-severity
 #| fig-cap: Spatial distribution of model residuals. 
 #| echo: false
 #| warning: false
@@ -887,6 +1067,89 @@ df <- as.data.frame(defol_only)
 ggplot() +
   geom_sf(data = ontario, fill = "navajowhite1", color = "black") +
   geom_point(data = df, aes(x = x, y = y, color = residuals_gls)) +
+  scale_color_gradient2(low = "#88CCEEA0", mid = "white", high = "#8B0000A0", midpoint = 0) +
+  labs(title = NULL, x = "Longitude", y = "Latitude", color = "Residuals") +
+  theme_bw()
+```
+
+```{r}
+#| echo: false
+#| warning: false
+#| label: gls-recovery-full model
+
+library(lme4)
+library(MuMIn)
+library(lmerTest)
+library(nlme)
+library(sp)
+library(gstat)
+
+
+# defol dataset
+defol_only <- subset(history_gt90, history == 1)
+
+# shift window_opp to 1-3 from 0-2
+defol_only <- defol_only %>%
+  mutate(window_opp = case_when(window_opp == "0" ~ "1",
+                                TRUE ~ window_opp))
+
+
+# Define the model formula
+formula <- recovery ~host_pct +  Cumulative_Years_Defol:window_opp + rbr_w_offset +
+  mean_temperature + sum_precipitation_mm +  x + y 
+
+# Fit the model using nlme with spatial correlation, where correlation decreases with distance
+# gls
+
+model_gls_rec <- gls(formula,
+                 correlation = corGaus(form = ~ x + y), 
+                 data = defol_only)
+
+# Residuals vs. Fitted Values Plot
+residual_plot_rec <- plot(fitted(model_gls_rec), resid(model_gls_rec)) +abline(h = 0, col = "red") # fit is good
+
+#model_glsI <- update(model_gls, weights = varIdent(form = ~ 1 | Time_Since_Defol))
+
+
+# Display the model summary
+summary(model_gls_rec)
+
+# r2
+rsquared.gls(model_gls_rec, formula)
+
+# extract residuals
+defol_only$residuals_gls_rec <- residuals(model_gls_rec)
+
+colnames(defol_only) <- make.names(colnames(defol_only))
+
+# get coords
+coordinates(defol_only) <- ~ x + y
+
+# Compute the variogram
+variogram_gls_rec <- variogram(residuals_gls_rec ~ 1, data = defol_only)
+
+# Plot the variogram
+var_plot_rec <- plot(variogram_gls_rec, main = "Variogram of Residuals (Gaussian)")
+
+# confirm defol_only as dataframe
+df_rec <- as.data.frame(defol_only)
+
+
+```
+
+```{r}
+#| label: fig-spatial-residuals-recovery
+#| fig-cap: Spatial distribution of model residuals. 
+#| echo: false
+#| warning: false
+#| message: false
+
+
+
+# Create a spatial plot of residuals
+ggplot() +
+  geom_sf(data = ontario, fill = "navajowhite1", color = "black") +
+  geom_point(data = df_rec, aes(x = x, y = y, color = residuals_gls_rec)) +
   scale_color_gradient2(low = "#88CCEEA0", mid = "white", high = "#8B0000A0", midpoint = 0) +
   labs(title = NULL, x = "Longitude", y = "Latitude", color = "Residuals") +
   theme_bw()
@@ -910,9 +1173,13 @@ We assessed the spatial distribution of burn severity of all 256 defoliated fire
 gls_pvalues_to_kable(model_gls)
 ```
 
+*Defoliation effect estimate on recovery magnitude*
+
+We analyzed the impact of defoliation on recovery magnitude by comparing 330 fires (165 defoliated and 165 non-defoliated) that occurred in the boreal shield of Ontario from 1990 to 2012. We found that fires with a history of defoliation had higher burn severity than fires without a history of defoliation. These results indicate that having a history of defoliation has a significant positive effect on the outcome, with an average effect size of 55.49 [@tbl-att-summary]. When comparing the impacts of defoliation according to different levels of time since defoliation following the "window of opportunity" described by Fleming et al. (2002), the overall average effect (55.50) is lower than the subgroup effects, highlighting that the burn severity is more pronounced when considering specific time frames post-defoliation. Additionally, our results indicate that the impact of defoliation on burn severity is not only immediate but also increases over time [@fig-subgroup-plot]. The average effect size grows from 73.21 in the first 2 years to 114.11 after 10 years [@tbl-att-summary].
+
 ### Discussion
 
-Our findings highlight the important role of spatial legacies of spruce budworm defoliation on exacerbating the impacts of wildfire on post-fire biomass and soil change (burn severity) and recovery capacity and reveal variability in the impactfulness of spatial legacies based on the amount, and duration of defoliation and time since defoliation. Our resutls
+Our findings highlight the important role of spatial legacies of spruce budworm defoliation on exacerbating the impacts of wildfire on post-fire biomass and soil change (burn severity) and recovery capacity and reveal variability in the impactfulness of spatial legacies based on the amount, duration of, and time since defoliation. Our resutls
 
 Goals:
 
