@@ -15,18 +15,57 @@
 #' adjusted_model <- adjust_matchit_params(hist_gt90_1, method = "nearest", caliper = 0.25)
 
 
-adjust_matchit_params <- function(data, method = "nearest", distance = "glm", link = "logit", m_order = "random", caliper = 0.2, replace = TRUE, use_mahvars = FALSE) {
-  mahvars <- if (use_mahvars && distance != "mahalanobis") {
-    ~host_pct + isi_90 + dc_90 + dmc_90 + ffmc_90 + bui_90 + fwi_90
+#adjust_matchit_params <- function(data, method = "nearest", distance = "glm", link = "logit", m_order = "random", caliper = 0.2, replace = TRUE, use_mahvars = FALSE) {
+#   mahvars <- if (use_mahvars && distance != "mahalanobis") {
+#     ~host_pct + isi_90 + dc_90 + dmc_90 + ffmc_90 + bui_90 + fwi_90
+#   } else {
+#     NULL
+#   }
+#   
+#   if (distance == "mahalanobis" && !is.null(caliper)) {
+#     caliper <- setNames(rep(caliper, length(all.vars(mahvars))), all.vars(mahvars))
+#   }
+#   
+#   model <- matchit(history ~ host_pct + isi_90 + dc_90 + dmc_90 + ffmc_90 + bui_90 + fwi_90,
+#                    data = data,
+#                    method = method,
+#                    distance = distance,
+#                    link = link,
+#                    m.order = m_order,
+#                    caliper = caliper,
+#                    replace = replace,
+#                    mahvars = mahvars)
+#   return(model)
+# }
+
+adjust_matchit_params <- function(data, response = "severity", method = "nearest", distance = "glm", link = "logit", m_order = "random", caliper = 0.2, replace = TRUE, use_mahvars = FALSE) {
+  
+  # Define the mahvars formula based on the response argument
+  if (response == "recovery") {
+    mahvars <- if (use_mahvars && distance != "mahalanobis") {
+      ~host_pct + rbr_w_offset + mean_temperature + sum_precipitation_mm
+    } else {
+      NULL
+    }
+    model_formula <- history ~ host_pct + rbr_w_offset + mean_temperature + sum_precipitation_mm
+  } else if (response == "severity") {
+    mahvars <- if (use_mahvars && distance != "mahalanobis") {
+      ~host_pct + isi_90 + dc_90 + dmc_90 + ffmc_90 + bui_90 + fwi_90
+    } else {
+      NULL
+    }
+    model_formula <- history ~ host_pct + isi_90 + dc_90 + dmc_90 + ffmc_90 + bui_90 + fwi_90
   } else {
-    NULL
+    stop("Invalid response argument. Use 'recovery' or 'severity'.")
   }
   
+  # Adjust caliper for Mahalanobis distance
   if (distance == "mahalanobis" && !is.null(caliper)) {
     caliper <- setNames(rep(caliper, length(all.vars(mahvars))), all.vars(mahvars))
   }
   
-  model <- matchit(history ~ host_pct + isi_90 + dc_90 + dmc_90 + ffmc_90 + bui_90 + fwi_90,
+  # Fit the model
+  model <- matchit(model_formula,
                    data = data,
                    method = method,
                    distance = distance,
@@ -37,9 +76,6 @@ adjust_matchit_params <- function(data, method = "nearest", distance = "glm", li
                    mahvars = mahvars)
   return(model)
 }
-
-
-
 #' Find Best MatchIt Model
 #'
 #' This function iterates over all combinations of the given parameters, stores the results in a list, and selects the best model based on the standard mean difference (SMD) being below 0.25.
@@ -67,7 +103,7 @@ adjust_matchit_params <- function(data, method = "nearest", distance = "glm", li
 #' 
 #' 
 #' 
-find_best_model <- function(data, methods, distances, links, m_orders, calipers, replace_list, use_mahvars_list) {
+find_best_model <- function(data,response, methods, distances, links, m_orders, calipers, replace_list, use_mahvars_list) {
   results <- list()
   best_model <- NULL
   best_smd <- Inf
@@ -79,7 +115,7 @@ find_best_model <- function(data, methods, distances, links, m_orders, calipers,
           for (caliper in calipers) {
             for (replace in replace_list) {
               for (use_mahvars in use_mahvars_list) {
-                model <- adjust_matchit_params(data, method, distance, link, m_order, caliper, replace, use_mahvars)
+                model <- adjust_matchit_params(data, response, method, distance, link, m_order, caliper, replace, use_mahvars)
                 model_summary <- summary(model)
                 
                 if (is.list(model_summary) && "sum.matched" %in% names(model_summary)) {
