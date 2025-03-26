@@ -155,7 +155,7 @@ m.data %>%
 m.data.sf <- st_as_sf(m.data, coords = c("x", "y"), crs = 4326)
 ```
 
-```{r}
+```{r mod-recovery, results='hide'}
 
 #| warning: false
 #| message: false
@@ -192,59 +192,19 @@ m.data.rec.sf <- st_as_sf(m.data.rec, coords = c("x", "y"), crs = 4326)
 
 ## Background
 
-In 2023, Canada experienced its most severe wildfire season on record, with 18.6 million hectares of forest burned. This, coupled with projected increases in the frequency and severity of outbreaks due to climate warming (Régnière et al 2012, Bouchard et al 2018, Weed et al 2013), raises concerns about the influence of these large-scale spatial legacies on wildfire behavior (Stocks 1987, Candau et al 2018, Fettig et al 2022). Adding to this concern is the climate-induced transition of black spruce from non-host to host species (Pureswaran et al 2019). Black spruce is the most widespread conifer in the eastern boreal forest. They are also considered to be the most flammable due to their resinous needles and their dense, low-lying branches that can easily catch fire and promote vertical spread of ground fires to high-severity canopy fires (Barrett et al 2010, Massey et al 2023).
-
-Spruce budworm (SBW) defoliation significantly alters forest structure and the distribution and connectivity of combustible fuels across large areas. Vertical fuel continuity, which refers to the vertical distribution of fuels within a forest stand , increases with consecutive years of defoliation (Watt et al 2018). These vertical fuels, often called ladder fuels, facilitate the transition of surface fires to high-severity canopy fires (Van Wagner 1977). Additionally, surface fuel abundance increases by 145% in the years following outbreaks (Watt et al 2020).
-
-Since the distribution of available fuel is a key driver of wildfire regimes, insect outbreaks are expected to have a strong bottom-up effect on wildfires (McCullough et al 1998). However, the cumulative effects of insect defoliation and subsequent natural disturbances, such as wildfire (James et al 2017), wind (Sturtevant et al 2014) and herbivory (Leroux et al 2021), often lead to non-linear responses that alter ecosystems in novel ways (Buma 2015). These non-linear responses contribute to the diversity of observed outcomes in past studies, and makes it challenging to disentangle how insect defoliation influences the emergent properties of subsequent disturbances.
-
-Emergent properties of disturbance interactions are often categorized as additive, synergistic, or antagonistic (Sturtevant and Fortin 2021). It is plausible that SBW defoliation could alter wildfire behavior in ways that result in any of these interactions, depending on the severity of defoliation and its spatial or temporal legacies. However, few studies have empirically demonstrated these interactions.
-
-Some research indicated that the spatial legacies of spruce budworm outbreaks increase fire risk (additive interaction) in Ontario (Stocks 1987, Fleming et al 2002a, James et al 2007) but decrease fire risk and severity (antagonistic interaction) in western North America (Lynch and Moorcroft 2008, Flower et al 2014). Additionally, the synergistic effects of defoliation on wildfire risk are limited to a specific time lag following defoliation. Outside of this "window of opportunity" of 8-10 years, the interaction may become antagonistic (James et al 2017, Fleming et al 2002a).
-
-Simulations of spruce budworm outbreaks suggests the effects of fuel changes following defoliation will result in neutral or antagonistic interactions (James et al 2011, Vane et al 2017, Cohn et al 2014). Two possible scenarios contribute to the contrasting and uncertain effects of wildfire and spruce budworm interactions: (1) fires are inherently noisy systems, and (2) the rarity of insect-wildfire co-occurrence. Historical reconstructions suggests SBW outbreaks tend to occur when fire activity is low (Simard et al 2006).
-
-The occurrence of wildfires is restricted by the abundance, structure, and connectivity of fuels (Miller and Urban 2000, Agee and Skinner 2005). However, in the eastern boreal forest, wildfire likelihood is primarily controlled by the top-down effects of fire weather. Under extreme fire weather conditions, the influence of fuels becomes negligible (Podur and Martell 2009). Therefore, it is possible that wildfire likelihood following defoliation is more influenced by weather than by forest fuels. James et al. (2017) supported this assertion by controlling for the variation explained by weather before modeling the effects of budworm legacies, thereby isolating the impact of SBW fuels on the likelihood of ignition. This highlights the challenge of disentangling clear cause-and-effect relationships given the significant role of weather and its interaction with fuels.
-
-Fuel, rather than fire weather and climate, is the most critical factor influencing wildfire burn severity (Parks et al 2014a, 2018). Burn severity, which refers to the ecological impact of fire on vegetation and soil, is a key component of fire regimes. The level of burn severity determines how long and how well an ecosystem can recover to its pre-disturbed state (Bright et al 2019).
-
-Interestingly, there is evidence that western spruce budworm (Choristoneura freeman) can reduce subsequent burn severity in the US Pacific Northwest (Meigs et al 2016). This reduction in severity is likely due to the forest recovery following budworm outbreaks, which often leads to the establishment and regeneration of nonhost species, such as broadleaf trees (Bouchard et al 2006). These species have higher moisture content and lower flammability (Parisien et al 2023).
-
-Since burn severity is crucial for ecosystem recovery, it is essential to consider both recovery and burn severity together. The non-linear impacts from disturbance interactions may not be immediately apparent after a fire. Currently, no studies have explicitly investigated the influence of eastern spruce budworm legacies on wildfire burn severity in the eastern boreal forest. The cumulative effects of insect outbreaks and wildfires on post-fire recovery remain uncertain.
-
-\--
-
 Insect defoliation is the most widespread natural disturbance agent in the eastern boreal forest, affecting more forest area than any other disturbance (McCullough et al 1998, Volney and Fleming 2000). The eastern spruce budworm (Choristoneura fumiferana Clemens) causes the most extensive damage among insect defoliators due to the large scale and high severity of its outbreaks (Navarro et al 2018). Native to North American coniferous forests, the primary hosts of the eastern spruce budworm (SBW) are balsam fir (Abies balsamea), which spruce (Picea glauca), and increasingly black spruce (Picea mariana) due to climate warming-induced phenological synchrony (Pureswaran et al 2019).
 
 SBW defoliation can lead to mortality if it continues for three or more consecutive years. However, more commonly, it results in crown and branch mortality and reduced growth in balsam fir and secondary hosts (MacLean 1984, Bergeron et al 1995, Nealis and Régnière 2004, Bouchard et al 2005). The long-term effects of SBW defoliation on vegetation dynamics are exacerbated by climate warming (Subedi et al 2023). The spatial legacies of SBW outbreaks can create landscape heterogeneity in vegetation patterns that can persist for decades, influencing the likelihood and severity of future disturbances (Taylor and MacLean 2009, James et al 2017).
 
-Fire severity is a measure of biomass and soil change used to gauge how intensely an ecosystem was impact by fire (Lentile et al 2013). A number of studies have posited that that spatial legacies of SBW defoliation will impact on wildfire effects (Cohn et al 2014; James et al. 2017). While there is evidence that supports insect-induced changes in vegetation structure prior to wildfire (Watt et al 2018, 2020), the causality between these changes and wildfire impacts such as changes in severity remain uncertain. This is because determining the causal impact of spruce budworm legacies on fire severity requires a control observation for comparison. However, most studies rely on historical defoliation and wildfire observational data. Identifying a control group is difficult as factors that influence fire outcomes include slope, vegetation type, or vegetation moisture. Therefore, establishing a control observation requires identifying statistically similar controls that burned under similar conditions. Fortunately, pre-processing methods such as propensity score matching are an established method for identifying such quasi-experimental controls in wildfire studies (Bustic, Woo x2 etc). Using pre-processed datasets, analysis such as linear regression can be used to predict average defoliation effect on wildfire severity.
+In 2023, Canada experienced its most severe wildfire season on record, with 18.6 million hectares of forest burned. This, coupled with projected increases in the frequency and severity of outbreaks due to climate warming (Régnière et al 2012, Bouchard et al 2018, Weed et al 2013), raises concerns about the influence of the large-scale spatial legacies of outbreaks on wildfire impacts (Stocks 1987, Candau et al 2018, Fettig et al 2022). Adding to this concern is the climate-induced transition of black spruce from non-host to host species (Pureswaran et al 2019). Black spruce is the most widespread conifer in the eastern boreal forest. They are also considered to be the most flammable due to their resinous needles and their dense, low-lying branches that can easily catch fire and promote vertical spread of ground fires to high-severity canopy fires (Barrett et al 2010, Massey et al 2023).
+
+Wildfire burn severity is a measure of biomass and soil change used to gauge how intensely an ecosystem was impact by fire (Lentile et al 2013). Burn severity is crucial to the structure and function of post-fire boreal ecosystems, influencing post-fire seed sources, aerial bud banks, soil nutrient availability and forest substraties (Splawinski et al. 2019, Brown and Johnstone 2012, Arseneault 2001), which limits post-fire tree establishment and growth (Johnstone and Chapin 2006, Johnstone and Kasischke 2005). Consequently, post-fire recovery trajectories are closely linked to the degree of burn severity (Whitman et al. 2018a, Strand et al. 2019, Lentile et al. 2007).
+
+A number of studies have posited that that spatial legacies of SBW defoliation will influence wildfire impacts on forest ecosystems (Cohn et al 2014; James et al. 2017). While there is evidence that supports insect-induced changes in vegetation structure prior to wildfire (Watt et al 2018, 2020), the causality between these changes and wildfire impacts such as changes in severity remain uncertain. This is because in order to elucidate the potential causal impact of spruce budworm legacies on fire severity requires a control observation for comparison. However, most studies rely on both historical defoliation and observational wildfire data. Identifying a control group is difficult as factors that influence fire outcomes include slope, vegetation type, or vegetation moisture. Therefore, establishing a control observation requires identifying statistically similar controls that burned under similar conditions. Fortunately, pre-processing methods such as propensity score matching are an established method for identifying such quasi-experimental controls in wildfire studies (Bustic, Woo x2 etc). Using pre-processed datasets, analysis such as linear regression can be used to predict average defoliation effect on wildfire severity.
 
 In observational studies, propensity score matching (PSM) is a common statistical technique applied to create a control group that is comparable in confounding variables to a treatment group in studies where treatments are unable to be randomly assigned. For each observation a propensity score (PS) is calculated which reflects the probability of receiving the treatment based on observed characteristics (i.e., potential confounders). Using propensity scores researchers can match participants from the treatment group with those from the control group based on the similarity between scores. The degree of similarity can be selected by researchers. Referred to as the caliper, it is suggested that the degree of similar is within +/- 0.3. By simulating the conditions of a randomized controlled trial, the process of PSM helps to balance the groups on observed characteristics, thereby reducing bias and allowing for a more accurate estimate of the treatment's impact. Using the balanced dataset, researchers are able to provide a more robust and reliable estimate of the treatment's effect.
 
-In this study, we aim to reduce the uncertainty surrounding the causal impacts of spatial legacies of SBW defoliation on wildfire severity in Ontario's boreal shield. We applied PSM to create a balanced control-treatment experimental design with observation data on wildfire-defoliation co-occurrences. We identified wildfires-defoliation co-occurrences between 1985-2012 using aerial-survey defoliation data and remotely sensed wildfire data. For each area, we quantified median burn severity and mean recovery magnitude. Spectral recovery trajectories were used to estimate post-fire recovery, as recent research shows they are effective and accurate at capturing post-fire structural recovery patterns in North American boreal forests (Smith‐Tripp et al 2024). Using these data, we estimated the average treatment effect (ATT) of defoliation on wildfire outcomes.
-
-Goals:
-
--   Present the problem and the proposed solution
-
--   Presents nature and scope of the problem investigated
-
--   Reviews the pertinent literature to orient the reader
-
--   States the method of the experiment
-
--   State the principle results of the experiment
-
-Checklist
-
--   Indicate the field of the work, why this field is important, and what has already been done (with proper citations).
-
--   Indicate a gap, raise a research question, or challenge prior work in this territory.
-
--   Outline the purpose and announce the present research, clearly indicating what is novel and why it is significant.
-
--   Avoid: repeating the abstract; providing unnecessary background information; exaggerating the importance of the work; claiming novelty without a proper literature search. 
+In this study, we aim to reduce the uncertainty surrounding the causal impacts of spatial legacies of SBW defoliation on wildfire severity in Ontario's boreal shield. We applied PSM to create a balanced control-treatment experimental design with observation data on wildfire-defoliation co-occurrences. We identified wildfires-defoliation co-occurrences between 1985-2012 using aerial-survey defoliation data and remotely sensed wildfire data. For each area, we quantified median burn severity and mean recovery magnitude. Spectral recovery trajectories were used to estimate post-fire recovery, as recent research shows they are effective and accurate at capturing post-fire structural recovery patterns in North American boreal forests (Smith‐Tripp et al 2024). Using these data, we estimated the average treatment effect (ATT) of defoliation on wildfire impacts and long-term outcomes.
 
 ## Question
 
@@ -252,7 +212,7 @@ How does the spatial legacies of defoliated areas affect **(a) burn severity** a
 
 Are there hotspots where defoliation has a more pronounced effect?
 
--   Are there other factors that interact with defoliation to influence spatial patterns of burn severity in defoliated areas?
+-   Are there other factors that interact with defoliation to influence spatial patterns of burn severity and recovery magnitude in defoliated areas?
 
 ## Methods
 
@@ -441,7 +401,7 @@ Daily fire weather is a strong top-down drive of burn severity (Whitman et al 20
 
 To quantify the effect of climate on vegetation growth during the 10-year period of post-fire recovery, we calculated mean temperature and precipitation for the growing season for the entire 10-year post-fire recovery period. For each fire, we determined the start and end of the growing season using growing degree days. Growing degree days (GDD) are a common approach to determine growing season length in the boreal shield (CITE). Start of the growing season was determined as 5 consecutive days where GDD \< 5°C after April 31. Likewise, end of the growing season was determined as 5 consecutive days where GDD \>5°C after August 31.
 
-Following
+To capture the effects of post-fire climate on recovery magnitude, we calculated mean temperature (°C) and total precipitation (mm) for each matched pair over a 10-year period following the fire. Temperature and precipitation data were extracted from ERA5-Land Daily Aggregated -ECMWF Climate Reanalysis (Muñoz Sabater 2019) in Google Earth Engine. ERA5-Land Daily Aggregated is a reanalysis product that combines model and observation data to produce daily gridded climate data at 9-km spatial resolution from 1950 onwards. We extracted temperature at 2 meters and the total precipitation at the centroid of each fire perimeter from post-fire imagery. We filtered post fire imagery for all dates between April 30th and August 31st of each year. Temperature data were converted from Kelvin to Celsius, and total precipitation was converted from meters to millimeters. These data were used to assess the effects of temperature and precipitation on post-fire regeneration and forest growth.
 
 ### Forest Composition
 
@@ -566,8 +526,7 @@ fwi_plot <- cobalt::bal.plot(m.out2,
 ```
 
 ```{r, echo= FALSE, message = FALSE, warning = FALSE, fig.width=8, fig.height=20}
-
-#| fig-cap: density of covariates across defoliated fire units (orange curves) and a sample of units non-defoliated fire units (red curves).
+#| fig-cap: Density of covariates across defoliated fire units (orange curves) and a sample of units non-defoliated fire units (red curves).
 #| label: fig-density-cov
 #| warning: false
 #| message: false
@@ -585,7 +544,23 @@ plot_grid(host_plot, isi_plot, dc_plot, dmc_plot, ffmc_plot, bui_plot,fwi_plot, 
 
 We examined whether the average defoliation effect differs according to various levels of time since defoliation. Prior to matching we subset the defoliated fires into three categories based on the time since defoliation. The categories were defined according to the "window of opportunity" outline by Fleming et al. (2002), who found that wildfire frequency and behaviour was disproportionately higher 3-9 years following defoliation. We subset defoliated fires into the following 3 categories: 0-2 years after defoliation, 3-9 years and greater than 10 years @tbl-ss-subgroup. We compared multiple matching matching methods for each subgroup. The model with the best fit was chosen as the model with the best covariate balance evaluated using SMD \<0.25 for each covariate (Stuart et al. 2013). We evaluated matching on propensity score, Mahalanobis distance, or matching on Mahalanobis distance while restricting propensity score between pairs. A combination of the two approached often preforms better then each individually (Rosenbaum and Rubin 1989). Matching occurred without replacement. Propensity scores were estimated using both nearest neighbour and optimal matching with either logit or probit link functions and we evaluated three separate calipers (Appendix A). The best model for each subgroup is presented in @tbl-sugroup-best-model. Using the best model for each subgroup, we calculated the average treatment effect (ATT) of defoliation history.
 
-```{r}
+```{r warning=FALSE, message=FALSE, echo=FALSE}
+#| echo: false
+#| warning: false
+#| message: false
+#| label: params
+
+methods <- c("nearest", "optimal")
+distances <- c("glm", "mahalanobis")
+links <- c("logit", "probit")
+m_orders <- c("random")
+calipers <- c(0.1, 0.2, 0.3)
+replace_list <- c(FALSE)
+use_mahvars_list <- c(FALSE, TRUE)
+
+```
+
+```{r warning=FALSE, message=FALSE, echo=FALSE}
 #| tbl-cap: "Sample size of defoliated and non-defoliated fires with a maximum overlap greater than 90%"
 #| label: tbl-ss-subgroup
 #| message: false
@@ -633,8 +608,7 @@ knitr::kable(ss_sg,  align = "c") %>%
 
 ```
 
-```{r}
-
+```{r warning=FALSE, message=FALSE, echo=FALSE}
 #| warning: false
 #| message: false
 #| echo: false
@@ -648,11 +622,10 @@ fit_att <- as.data.frame(marginaleffects::avg_comparisons(fit,
                 newdata = subset(history == 1))) %>% 
   mutate(Fires= "all")
 
-fit_att
+
 ```
 
-```{r}
-
+```{r warning=FALSE, message=FALSE, echo=FALSE}
 #| warning: false
 #| message: false
 #| echo: false
@@ -672,7 +645,10 @@ fit_att_rec <- as.data.frame(marginaleffects::avg_comparisons(fit_rec_baseline,
 
 p <- marginaleffects::plot_predictions(fit_rec_baseline, condition = c("history"), draw = FALSE) 
 
-ggplot(p, aes(x = history, y = estimate, color = history)) +
+p <- p %>% 
+  mutate(Fires = "All")
+
+plot1 <- ggplot(p, aes(x = history, y = estimate, color = history)) +
   geom_point(size = 4) +
   geom_errorbar(aes(ymin = conf.low, ymax = conf.high), width = 0.2) +
   labs(y = "Recovery Magnitude (%)", x = "Defoliation History", color = "History") +
@@ -682,7 +658,7 @@ ggplot(p, aes(x = history, y = estimate, color = history)) +
   theme(legend.position = "none")
 ```
 
-```{r}
+```{r warning=FALSE, message=FALSE, echo=FALSE}
 #| warning: false
 #| message: false
 #| echo: false
@@ -706,9 +682,12 @@ att.rec.w1 <- as.data.frame(marginaleffects::avg_comparisons(fit.rec.w1,
                 newdata = subset(history == "Defoliated"))) %>% 
   mutate(Fires= "0-2 years defoliated")
 
-p <- marginaleffects::plot_predictions(fit.rec.w1, condition = c("history"), draw = FALSE) 
+p1 <- marginaleffects::plot_predictions(fit.rec.w1, condition = c("history"), draw = FALSE) 
 
-ggplot(p, aes(x = history, y = estimate, color = history)) +
+p1 <- p1 %>% 
+  mutate(Fires= "0-2 years after defoliation")
+
+plot2 <- ggplot(p1, aes(x = history, y = estimate, color = history)) +
   geom_point(size = 4) +
   geom_errorbar(aes(ymin = conf.low, ymax = conf.high), width = 0.2) +
   labs(y = "Recovery Magnitude (%)", x = "Defoliation History", color = "History") +
@@ -718,7 +697,7 @@ ggplot(p, aes(x = history, y = estimate, color = history)) +
   theme(legend.position = "none")
 ```
 
-```{r}
+```{r warning=FALSE, message=FALSE, echo=FALSE}
 #| warning: false
 #| message: false
 #| echo: false
@@ -742,9 +721,12 @@ att.rec.w2 <- as.data.frame(marginaleffects::avg_comparisons(fit.rec.w2,
                 newdata = subset(history == "Defoliated"))) %>% 
   mutate(Fires= "3-9 years defoliated")
 
-p <- marginaleffects::plot_predictions(fit.rec.w2, condition = c("history"), draw = FALSE) 
+p2 <- marginaleffects::plot_predictions(fit.rec.w2, condition = c("history"), draw = FALSE) 
 
-ggplot(p, aes(x = history, y = estimate, color = history)) +
+p2 <- p2 %>% 
+  mutate(Fires= "3-9 years after defoliation")
+
+plot3 <- ggplot(p2, aes(x = history, y = estimate, color = history)) +
   geom_point(size = 4) +
   geom_errorbar(aes(ymin = conf.low, ymax = conf.high), width = 0.2) +
   labs(y = "Recovery Magnitude (%)", x = "Defoliation History", color = "History") +
@@ -754,15 +736,15 @@ ggplot(p, aes(x = history, y = estimate, color = history)) +
   theme(legend.position = "none")
 ```
 
-```{r}
+```{r warning=FALSE, message=FALSE, echo=FALSE}
 #| warning: false
 #| message: false
 #| echo: false
 #| label: recovery-subgroup-matched-data-tsd3
 
-best_model_info_recovery <- find_best_model(hist_gt90_3, "recovery", methods, distances, links, m_orders, calipers, replace_list, use_mahvars_list)
-best_model_3_recovery <- best_model_info_recovery$best_model
-all_results_recovery <- best_model_info_recovery$results
+best_model_info_3_recovery <- find_best_model(hist_gt90_3, "recovery", methods, distances, links, m_orders, calipers, replace_list, use_mahvars_list)
+best_model_3_recovery <- best_model_info_3_recovery$best_model
+all_results_recovery <- best_model_info_3_recovery$results
 
 m.data.rec.w3 <- match_data(best_model_3_recovery)
 
@@ -776,11 +758,14 @@ att.rec.w3 <- as.data.frame(marginaleffects::avg_comparisons(fit.rec.w3,
                 variables = "history",
                 vcov = ~subclass,
                 newdata = subset(history == "Defoliated"))) %>% 
-  mutate(Fires= "3-9 years defoliated")
+  mutate(Fires= "10+ years defoliated")
 
-p <- marginaleffects::plot_predictions(fit.rec.w3, condition = c("history"), draw = FALSE) 
+p3 <- marginaleffects::plot_predictions(fit.rec.w3, condition = c("history"), draw = FALSE) 
 
-ggplot(p, aes(x = history, y = estimate, color = history)) +
+p3 <- p3 %>%  
+  mutate(Fires= "10-15 years after defoliation")
+  
+plot4 <- ggplot(p3, aes(x = history, y = estimate, color = history)) +
   geom_point(size = 4) +
   geom_errorbar(aes(ymin = conf.low, ymax = conf.high), width = 0.2) +
   labs(y = "Recovery Magnitude (%)", x = "Defoliation History", color = "History") +
@@ -790,23 +775,7 @@ ggplot(p, aes(x = history, y = estimate, color = history)) +
   theme(legend.position = "none")
 ```
 
-```{r}
-#| echo: false
-#| warning: false
-#| message: false
-#| label: params
-
-methods <- c("nearest", "optimal")
-distances <- c("glm", "mahalanobis")
-links <- c("logit", "probit")
-m_orders <- c("random")
-calipers <- c(0.1, 0.2, 0.3)
-replace_list <- c(FALSE)
-use_mahvars_list <- c(FALSE, TRUE)
-
-```
-
-```{r}
+```{r warning=FALSE, message=FALSE, echo=FALSE}
 
 #| warning: false
 #| message: false
@@ -828,7 +797,7 @@ m.data.w1 %>%
 
 ```
 
-```{r}
+```{r warning=FALSE, message=FALSE, echo=FALSE}
 #| warning: false
 #| message: false
 #| echo: false
@@ -850,7 +819,7 @@ m.data.w2 %>%
 
 ```
 
-```{r}
+```{r warning=FALSE, message=FALSE, echo=FALSE}
 #| warning: false
 #| message: false
 #| echo: false
@@ -874,7 +843,7 @@ m.data.w3 %>%
 
 ```
 
-```{r}
+```{r warning=FALSE, message=FALSE, echo=FALSE}
 
 #| warning: false
 #| message: false
@@ -890,7 +859,7 @@ fit.w1_att <- as.data.frame(marginaleffects::avg_comparisons(fit.w1,
   mutate(Fires= "0-2 years after defoliation")
 ```
 
-```{r}
+```{r warning=FALSE, message=FALSE, echo=FALSE}
 
 #| warning: false
 #| message: false
@@ -907,7 +876,7 @@ fit.w2_att <- as.data.frame(marginaleffects::avg_comparisons(fit.w2,
   mutate(Fires= "3-9 years after defoliation")
 ```
 
-```{r}
+```{r warning=FALSE, message=FALSE, echo=FALSE}
 
 #| warning: false
 #| message: false
@@ -988,7 +957,7 @@ knitr::kable(subgroup_modstruct,  align = "l") %>%
 
 Based on *a priori* expectations of east-west variations in vegetation type, composition, and climate, we examined the spatial patterns of burn severity and recovery magnitude for fires with a history of defoliation (n = 256). We modeled burn severity as a function of host percentage, cumulative years of defoliation, time since defoliation, and several fire weather indices. Recovery magnitude was modeled as a function of host percentage, cumulative years of defoliation, time since defoliation, burn severity, mean tempeature and total precipitation.In each model time since defoliation was modeled as a factor with 3 levels corresponding to three windows of opportunity. We included an interaction between cumulative years of defoliation and time since defoliation, as we predict areas where defoliated occurred in successive years will have greater burn severity due to increase fuel loads, and lower recovery magnitude due to increased severity. Therefore we would expect the interaction between cumulative years of defoliation and time since defoliation to reveal hotspots with a high degree of burn severity, or low levels of recovery magnitude. We fit a generalized least squares (GLS) model with a Gaussian spatial correlation structure, where correlation decreases with distance. Model fit was assessed by plotting residuals against fitted values (Appendix 1), and indicated a good fit with residuals centered around zero. To assess spatial autocorrelation, a variogram of the residuals was computed (Appendix 1) and plotted the spatial distribution of the model residuals.
 
-```{r}
+```{r warning=FALSE, message=FALSE, echo=FALSE}
 #| echo: false
 #| warning: false
 #| label: gls-severity-full model
@@ -1072,7 +1041,7 @@ ggplot() +
   theme_bw()
 ```
 
-```{r}
+```{r warning=FALSE, message=FALSE, echo=FALSE}
 #| echo: false
 #| warning: false
 #| label: gls-recovery-full model
@@ -1175,7 +1144,100 @@ gls_pvalues_to_kable(model_gls)
 
 *Defoliation effect estimate on recovery magnitude*
 
-We analyzed the impact of defoliation on recovery magnitude by comparing 330 fires (165 defoliated and 165 non-defoliated) that occurred in the boreal shield of Ontario from 1990 to 2012. We found that fires with a history of defoliation had higher burn severity than fires without a history of defoliation. These results indicate that having a history of defoliation has a significant positive effect on the outcome, with an average effect size of 55.49 [@tbl-att-summary]. When comparing the impacts of defoliation according to different levels of time since defoliation following the "window of opportunity" described by Fleming et al. (2002), the overall average effect (55.50) is lower than the subgroup effects, highlighting that the burn severity is more pronounced when considering specific time frames post-defoliation. Additionally, our results indicate that the impact of defoliation on burn severity is not only immediate but also increases over time [@fig-subgroup-plot]. The average effect size grows from 73.21 in the first 2 years to 114.11 after 10 years [@tbl-att-summary].
+We analyzed the impact of defoliation on recovery magnitude by comparing 308 fires (154 defoliated and 154 non-defoliated) that occurred in the boreal shield of Ontario from 1990 to 2012. We found a significant negative impact of defoliation on recovery following a wildfire across all examined time periods. The overall average defoliation effect (ATE) was -24.34 [@tbl-att-summary-recovery]. Across all examined time periods of time since defoliation, we observed a significant negative trend in recovery magnitude [@fig-subgroup-recovery]. In the first 0-2 years post-defoliation, the ATE was -16.14. For the period 3-9 years after defoliation, the ATE was -17.96. Even 10+ years post-defoliation, the negative effect on recovery persisted, with an ATE of -19.69. The consistently negative effect indicates that defoliation hinders recovery regardless of defoliation occurring over short and long-term periods .These results underscore the long-term detrimental effects of defoliation on recovery following a wildfire.
+
+```{r}
+#| warning: false
+#| message: false
+#| echo: false
+#| label: fig-subgroup-recovery
+
+all_rec = rbind(p, p1, p2, p3)
+
+# Specify the desired order of the x-axis values
+desired_order <- c("All", "0-2 years after defoliation", "3-9 years after defoliation", "10-15 years after defoliation")  # Replace with your actual values
+
+# Convert the fires column to a factor with the specified order
+all_rec$Fires <- factor(all_rec$Fires, levels = desired_order)
+
+ggplot(all_rec, aes(x = Fires, y = estimate, fill = history)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.7), width = 0.7, color = "black") +
+  geom_errorbar(aes(ymin = conf.low, ymax = conf.high), width = 0.2, position = position_dodge(width = 0.7)) +
+  labs(y = "Recovery Magnitude (%)", x = "Data Subgroup", fill = "Defoliation History") +
+  scale_fill_manual(values = c("Defoliated" = "#FF8C00A0", "Non-Defoliated" = "#8B0000A0")) +
+  scale_y_continuous(expand = c(0, 0), limits = c(70, 105), oob = scales::squish) +
+  theme_bw() +
+  theme(
+    legend.position = "right",
+    panel.border = element_rect(color = "black", size = 0.8)  # Adjust the size to change border thickness
+  )
+
+```
+
+```{r warning=FALSE, message=FALSE, echo=FALSE}
+#| warning: false
+#| message: false
+#| echo: false
+#| label: fig-subgroup-plot-recovery
+#| fig-cap: Average treatment effect (ATT) estimates and their lower (2.5%) and upper (97.5%) confidence intervals for the effects of defoliation for entire dataset (all) and across all levels of time since defoliation.
+
+att_comparison_rec <- rbind(att.rec.w1, att.rec.w2, att.rec.w3, fit_att_rec)
+
+# Specify the desired order of the x-axis values
+desired_order <- c("all", "0-2 years after defoliation", "3-9 years after defoliation", "10+ years after defoliation")  # Replace with your actual values
+
+# Convert the fires column to a factor with the specified order
+att_comparison_rec$Fires <- factor(att_comparison$Fires, levels = desired_order)
+
+
+ggplot(att_comparison_rec, aes(x = Fires, y = estimate)) +
+    geom_errorbar(aes(ymin = conf.low, ymax = conf.high), width = 0.5, colour = "#8B0000A0") +
+  geom_point(color="#8B0000A0", size = 4) +
+  labs(x = "Data Subgroup", y = "Percent change in Recovery Magnitude") +
+  theme_classic()+
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+  
+# average effect of defoliation
+  
+```
+
+```{r warning=FALSE, message=FALSE, echo=FALSE}
+#| echo: false
+#| label: tbl-att-summary-recovery
+#| tbl-cap: Average defoliation effect on Burn Severity based on defolation status (window of opportunity)
+options(scipen = 999)
+att_comparison_rec %>% 
+  relocate(Fires, .before = term) %>% 
+  rename(Subgroup = Fires) %>%  
+  mutate(conf.low = round(conf.low, 2),
+         conf.high = round(conf.high, 2)) %>% 
+  mutate(`95% CI` = paste(conf.low, conf.high, sep = ", ")) %>% 
+  select(c(Subgroup, estimate, std.error, `95% CI`, statistic, p.value)) %>% 
+  rename(`p` = `p.value` ) %>% 
+  rename("se ± " = "std.error") %>% 
+  mutate(across(where(is.numeric), round, 3)) %>% 
+  mutate(p = if_else(`p` < 0.0001, "< 0.0001", as.character(`p`)))%>% 
+  mutate(across(where(is.numeric), round, 2)) %>% 
+  knitr::kable(.,  align = "l") %>%
+  kableExtra::kable_styling(position = "left" )
+```
+
+```{r}
+#| echo: false
+#| label: tbl-sugroup-best-model-recovery
+#| tbl-cap: Matching parameters for subgroup models chosen based on best covariate balance of all covariates with SMD <0.25.
+
+subgroup_modstruct_rec <- extract_best_model_params(best_model_1_recovery, best_model_2_recovery, best_model_3_recovery)
+
+# View the table
+knitr::kable(subgroup_modstruct_rec,  align = "l") %>%
+  kableExtra::kable_styling(position = "left" )
+
+```
+
+*Spatial patterns of recovery magnitude*
+
+We assessed the spatial distribution of recovery magnitude of all 256 defoliated fires that burned in the boreal shield of Ontario from 1990 to 2012 using a GLS model with a Gaussian correlation structure which incorporated the effects of defoliation, burn severity and post-fire recovery climate. The spatial distribution of model residuals revealed no obvious patterns [@fig-spatial-residuals-recovery], and the spatial correlation structure indicated a range parameter estimate of 0.0011, suggesting a very short spatial correlation range. Significant predictors identified in the model included the percentage of host species and cumulative years of defoliation in the first and second windows. The percentage of host species within a fire had a significant negative effect on recovery magnitude, indicating that higher percentages of host species are associated with lower recovery magnitude. Cumulative years of defoliation in the first window and in the second window showed significant positive effects on recovery magnitude, suggesting that defoliation over these periods is associated with higher recovery magnitude. Other variables, such as mean temperature, sum precipitation, and burn severity, did not show significant effects. These results highlight the significant influence of host plant percentage and cumulative years of defoliation on recovery magnitude, while other factors did not show significant impacts.
 
 ### Discussion
 
