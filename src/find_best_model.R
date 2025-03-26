@@ -283,6 +283,18 @@ gls_pvalues_to_kable <- function(model_gls) {
   # Get the summary of the GLS model
   summary_gls <- summary(model_gls)
   
+  add_significance_stars <- function(p_value) {
+    if (p_value < 0.001) {
+      return("***")
+    } else if (p_value < 0.01) {
+      return("**")
+    } else if (p_value < 0.05) {
+      return("*")
+    } else {
+      return("")
+    }
+  }
+  
   # Extract the p-value table
   p_values <-summary_gls$tTable %>%
     as.data.frame() %>% 
