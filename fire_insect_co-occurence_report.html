@@ -72,19 +72,28 @@ ul.task-list li input[type="checkbox"] {
 <div class="cell">
 
 </div>
+<div class="cell">
+
+</div>
 <section id="overview" class="level1">
 <h1>Overview</h1>
 <section id="background" class="level2">
 <h2 class="anchored" data-anchor-id="background">Background</h2>
-<p>Fire severity is a measure of biomass and soil change used to gauge how intensely an ecosystem was impact by fire (Lentile et al 2013). A number of studies have posited that that spatial legacies of SBW defoliation will impact on wildfire effects (Cohn et al 2014; James et al.&nbsp;2017). While there is evidence that supports insect-induced changes in vegetation structure prior to wildfire (Watt et al 2018, 2020), the causality between these changes and wildfire impacts such as changes in severity remain uncertain. This is because determining the causal impact of spruce budworm legacies on fire severity requires a control observation for comparison. However, most studies rely on historical defoliation and wildfire observational data. Identifying a control group is difficult as factors that influence fire outcomes include slope, vegetation type, or vegetation moisture. Therefore, establishing a control observation requires identifying statistically similar controls that burned under similar conditions. Fortunately, pre-processing methods such as propensity score matching are an established method for identifying such quasi-experimental controls in wildfire studies (Bustic, Woo x2 etc). Using pre-processed datasets, analysis such as linear regression can be used to predict average defoliation effect on wildfire severity.</p>
+<p>Insect defoliation is the most widespread natural disturbance agent in the eastern boreal forest, affecting more forest area than any other disturbance (McCullough et al 1998, Volney and Fleming 2000). The eastern spruce budworm (Choristoneura fumiferana Clemens) causes the most extensive damage among insect defoliators due to the large scale and high severity of its outbreaks (Navarro et al 2018). Native to North American coniferous forests, the primary hosts of the eastern spruce budworm (SBW) are balsam fir (Abies balsamea), which spruce (Picea glauca), and increasingly black spruce (Picea mariana) due to climate warming-induced phenological synchrony (Pureswaran et al 2019).</p>
+<p>SBW defoliation can lead to mortality if it continues for three or more consecutive years. However, more commonly, it results in crown and branch mortality and reduced growth in balsam fir and secondary hosts (MacLean 1984, Bergeron et al 1995, Nealis and Régnière 2004, Bouchard et al 2005). The long-term effects of SBW defoliation on vegetation dynamics are exacerbated by climate warming (Subedi et al 2023). The spatial legacies of SBW outbreaks can create landscape heterogeneity in vegetation patterns that can persist for decades, influencing the likelihood and severity of future disturbances (Taylor and MacLean 2009, James et al 2017).</p>
+<p>In 2023, Canada experienced its most severe wildfire season on record, with 18.6 million hectares of forest burned. This, coupled with projected increases in the frequency and severity of outbreaks due to climate warming (Régnière et al 2012, Bouchard et al 2018, Weed et al 2013), raises concerns about the influence of the large-scale spatial legacies of outbreaks on wildfire impacts (Stocks 1987, Candau et al 2018, Fettig et al 2022). Adding to this concern is the climate-induced transition of black spruce from non-host to host species (Pureswaran et al 2019). Black spruce is the most widespread conifer in the eastern boreal forest. They are also considered to be the most flammable due to their resinous needles and their dense, low-lying branches that can easily catch fire and promote vertical spread of ground fires to high-severity canopy fires (Barrett et al 2010, Massey et al 2023).</p>
+<p>Wildfire burn severity is a measure of biomass and soil change used to gauge how intensely an ecosystem was impact by fire (Lentile et al 2013). Burn severity is crucial to the structure and function of post-fire boreal ecosystems, influencing post-fire seed sources, aerial bud banks, soil nutrient availability and forest substraties (Splawinski et al.&nbsp;2019, Brown and Johnstone 2012, Arseneault 2001), which limits post-fire tree establishment and growth (Johnstone and Chapin 2006, Johnstone and Kasischke 2005). Consequently, post-fire recovery trajectories are closely linked to the degree of burn severity (Whitman et al.&nbsp;2018a, Strand et al.&nbsp;2019, Lentile et al.&nbsp;2007).</p>
+<p>A number of studies have posited that that spatial legacies of SBW defoliation will influence wildfire impacts on forest ecosystems (Cohn et al 2014; James et al.&nbsp;2017). While there is evidence that supports insect-induced changes in vegetation structure prior to wildfire (Watt et al 2018, 2020), the causality between these changes and wildfire impacts such as changes in severity remain uncertain. This is because in order to elucidate the potential causal impact of spruce budworm legacies on fire severity requires a control observation for comparison. However, most studies rely on both historical defoliation and observational wildfire data. Identifying a control group is difficult as factors that influence fire outcomes include slope, vegetation type, or vegetation moisture. Therefore, establishing a control observation requires identifying statistically similar controls that burned under similar conditions. Fortunately, pre-processing methods such as propensity score matching are an established method for identifying such quasi-experimental controls in wildfire studies (Bustic, Woo x2 etc). Using pre-processed datasets, analysis such as linear regression can be used to predict average defoliation effect on wildfire severity.</p>
 <p>In observational studies, propensity score matching (PSM) is a common statistical technique applied to create a control group that is comparable in confounding variables to a treatment group in studies where treatments are unable to be randomly assigned. For each observation a propensity score (PS) is calculated which reflects the probability of receiving the treatment based on observed characteristics (i.e., potential confounders). Using propensity scores researchers can match participants from the treatment group with those from the control group based on the similarity between scores. The degree of similarity can be selected by researchers. Referred to as the caliper, it is suggested that the degree of similar is within +/- 0.3. By simulating the conditions of a randomized controlled trial, the process of PSM helps to balance the groups on observed characteristics, thereby reducing bias and allowing for a more accurate estimate of the treatment’s impact. Using the balanced dataset, researchers are able to provide a more robust and reliable estimate of the treatment’s effect.</p>
-<p>In this study, we aim to reduce the uncertainty surrounding the causal impacts of spatial legacies of SBW defoliation on wildfire severity in Ontario’s boreal shield. We applied PSM to create a balanced control-treatment experimental design with observation data on wildfire-defoliation co-occurrences. We identified wildfires-defoliation co-occurrences between 1985-2012 using aerial-survey defoliation data and remotely sensed wildfire data. For each area, we quantified median burn severity and mean recovery magnitude. Spectral recovery trajectories were used to estimate post-fire recovery, as recent research shows they are effective and accurate at capturing post-fire structural recovery patterns in North American boreal forests (Smith‐Tripp et al 2024). Using these data, we estimated the average treatment effect (ATT) of defoliation on wildfire outcomes.</p>
+<p>In this study, we aim to reduce the uncertainty surrounding the causal impacts of spatial legacies of SBW defoliation on wildfire severity in Ontario’s boreal shield. We applied PSM to create a balanced control-treatment experimental design with observation data on wildfire-defoliation co-occurrences. We identified wildfires-defoliation co-occurrences between 1985-2012 using aerial-survey defoliation data and remotely sensed wildfire data. For each area, we quantified median burn severity and mean recovery magnitude. Spectral recovery trajectories were used to estimate post-fire recovery, as recent research shows they are effective and accurate at capturing post-fire structural recovery patterns in North American boreal forests (Smith‐Tripp et al 2024). Using these data, we estimated the average treatment effect (ATT) of defoliation on wildfire impacts and long-term outcomes.</p>
 </section>
 <section id="question" class="level2">
 <h2 class="anchored" data-anchor-id="question">Question</h2>
-<p>How does defoliation influence <strong>(a) burn severity</strong> and <strong>(b) recovery magnitude</strong></p>
-<p>Furthermore, we examine whether the average treatment effect is different at the three separate time periods after SBW defoliation outlined by Fleming et al.&nbsp;(2002)</p>
-<p>Within defoliated fires, what are the dominant drivers of burn severity?</p>
+<p>How does the spatial legacies of defoliated areas affect <strong>(a) burn severity</strong> and <strong>(b) recovery magnitude?</strong></p>
+<p>Are there hotspots where defoliation has a more pronounced effect?</p>
+<ul>
+<li>Are there other factors that interact with defoliation to influence spatial patterns of burn severity and recovery magnitude in defoliated areas?</li>
+</ul>
 </section>
 <section id="methods" class="level2">
 <h2 class="anchored" data-anchor-id="methods">Methods</h2>
@@ -174,7 +183,7 @@ ul.task-list li input[type="checkbox"] {
 <section id="climate-data" class="level3">
 <h3 class="anchored" data-anchor-id="climate-data">Climate data</h3>
 <p>To quantify the effect of climate on vegetation growth during the 10-year period of post-fire recovery, we calculated mean temperature and precipitation for the growing season for the entire 10-year post-fire recovery period. For each fire, we determined the start and end of the growing season using growing degree days. Growing degree days (GDD) are a common approach to determine growing season length in the boreal shield (CITE). Start of the growing season was determined as 5 consecutive days where GDD &lt; 5°C after April 31. Likewise, end of the growing season was determined as 5 consecutive days where GDD &gt;5°C after August 31.</p>
-<p>Following</p>
+<p>To capture the effects of post-fire climate on recovery magnitude, we calculated mean temperature (°C) and total precipitation (mm) for each matched pair over a 10-year period following the fire. Temperature and precipitation data were extracted from ERA5-Land Daily Aggregated -ECMWF Climate Reanalysis (Muñoz Sabater 2019) in Google Earth Engine. ERA5-Land Daily Aggregated is a reanalysis product that combines model and observation data to produce daily gridded climate data at 9-km spatial resolution from 1950 onwards. We extracted temperature at 2 meters and the total precipitation at the centroid of each fire perimeter from post-fire imagery. We filtered post fire imagery for all dates between April 30th and August 31st of each year. Temperature data were converted from Kelvin to Celsius, and total precipitation was converted from meters to millimeters. These data were used to assess the effects of temperature and precipitation on post-fire regeneration and forest growth.</p>
 </section>
 <section id="forest-composition" class="level3">
 <h3 class="anchored" data-anchor-id="forest-composition">Forest Composition</h3>
@@ -209,7 +218,7 @@ ul.task-list li input[type="checkbox"] {
 </div>
 </div>
 </div>
-<p>We used the MatchIt package in R (Ho et al.&nbsp;2011) to match the treatment fires (defoliated) with control fires (non-defoliated) with the most similar covariate values. Initially, we conducted propensity score martching (PSM) on the entire dataset. The covariates we matched on in the model were weather, topography, spatial and environmental covariates <strong>(TABLE)</strong>. We estimated propensity scores using a generalized linear model with a probit link function. We used nearest neighbor matching with a caliper of 0.10 to ensure that matched pairs had similar propensity scores. Our target estimate was the average treatment effect in the treated (defoliated) fires (ATT). We estimated propensity scores using a generalized linear model with a probit link function. We used nearest neighbor matching with a caliper of 0.10 to ensure that matched pairs had similar propensity scores. Our target estimate was the average treatment effect in the treated (defoliated) fires (ATT). We estimated the treatment effect using g-computation with a cluster-robust standard error to account for pair membership within <code>marginaleffects</code> package in <code>R</code>. We assessed covariate balance before and after matching using the love plots of the standardized mean difference (SMD) <a href="#fig-asmd">Figure&nbsp;2</a>, and density plots of all covariates <strong>?@fig-density-cov</strong> using the cobalt package (Greifer, 2023). SMD represents the mean difference between treatment and control units and we considered a threshold of &lt; 0.25 as an indication of acceptable covariate balance (Stuart et al., 2013). Our final sample sizes after matching were 165 treated and control units respectively <a href="#fig-study-area-2">Figure&nbsp;1</a> B).</p>
+<p>We used the MatchIt package in R (Ho et al.&nbsp;2011) to match the treatment fires (defoliated) with control fires (non-defoliated) with the most similar covariate values. Initially, we conducted propensity score martching (PSM) on the entire dataset. The covariates we matched on in the model were weather, topography, spatial and environmental covariates <strong>(TABLE)</strong>. We estimated propensity scores using a generalized linear model with a probit link function. We used nearest neighbor matching with a caliper of 0.10 to ensure that matched pairs had similar propensity scores. Our target estimate was the average treatment effect in the treated (defoliated) fires (ATT). We estimated propensity scores using a generalized linear model with a probit link function. We used nearest neighbor matching with a caliper of 0.10 to ensure that matched pairs had similar propensity scores. Our target estimate was the average treatment effect in the treated (defoliated) fires (ATT). We estimated the treatment effect using g-computation with a cluster-robust standard error to account for pair membership within <code>marginaleffects</code> package in <code>R</code>. We assessed covariate balance before and after matching using the love plots of the standardized mean difference (SMD) <a href="#fig-asmd">Figure&nbsp;2</a>, and density plots of all covariates <a href="#fig-density-cov">Figure&nbsp;3</a> using the cobalt package (Greifer, 2023). SMD represents the mean difference between treatment and control units and we considered a threshold of &lt; 0.25 as an indication of acceptable covariate balance (Stuart et al., 2013). Our final sample sizes after matching were 165 treated and control units respectively <a href="#fig-study-area-2">Figure&nbsp;1</a> B).</p>
 <div class="cell">
 <div class="cell-output-display">
 <div id="fig-asmd" class="quarto-figure quarto-figure-center anchored">
@@ -225,12 +234,20 @@ ul.task-list li input[type="checkbox"] {
 </div>
 <div class="cell">
 <div class="cell-output-display">
-<p><img src="fire_insect_co-occurence_report_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid" width="768"></p>
+<div id="fig-density-cov" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="fire_insect_co-occurence_report_files/figure-html/fig-density-cov-1.png" class="img-fluid figure-img" width="768"></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;3: Density of covariates across defoliated fire units (orange curves) and a sample of units non-defoliated fire units (red curves).</figcaption><p></p>
+</figure>
+</div>
 </div>
 </div>
 <section id="subgroup-analysis" class="level4">
 <h4 class="anchored" data-anchor-id="subgroup-analysis">Subgroup analysis</h4>
 <p>We examined whether the average defoliation effect differs according to various levels of time since defoliation. Prior to matching we subset the defoliated fires into three categories based on the time since defoliation. The categories were defined according to the “window of opportunity” outline by Fleming et al.&nbsp;(2002), who found that wildfire frequency and behaviour was disproportionately higher 3-9 years following defoliation. We subset defoliated fires into the following 3 categories: 0-2 years after defoliation, 3-9 years and greater than 10 years <a href="#tbl-ss-subgroup">Table&nbsp;3</a>. We compared multiple matching matching methods for each subgroup. The model with the best fit was chosen as the model with the best covariate balance evaluated using SMD &lt;0.25 for each covariate (Stuart et al.&nbsp;2013). We evaluated matching on propensity score, Mahalanobis distance, or matching on Mahalanobis distance while restricting propensity score between pairs. A combination of the two approached often preforms better then each individually (Rosenbaum and Rubin 1989). Matching occurred without replacement. Propensity scores were estimated using both nearest neighbour and optimal matching with either logit or probit link functions and we evaluated three separate calipers (Appendix A). The best model for each subgroup is presented in <a href="#tbl-sugroup-best-model">Table&nbsp;5</a>. Using the best model for each subgroup, we calculated the average treatment effect (ATT) of defoliation history.</p>
+<div class="cell">
+
+</div>
 <div class="cell">
 <div class="cell-output-display">
 <div id="tbl-ss-subgroup" class="anchored">
@@ -266,75 +283,27 @@ ul.task-list li input[type="checkbox"] {
 </div>
 </div>
 <div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code>     term contrast estimate std.error statistic      p.value  s.value conf.low
-1 history    1 - 0 51.18216  12.50271  4.093685 4.245715e-05 14.52363 26.67729
-  conf.high predicted_lo predicted_hi predicted Fires
-1  75.68702     221.1051     269.4116  269.4116   all</code></pre>
-</div>
+
 </div>
 <div class="cell">
 
 </div>
 <div class="cell">
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: The arguments `caliper` and `m.order` are not used with `method =
-"optimal"` and will be ignored.
-The arguments `caliper` and `m.order` are not used with `method =
-"optimal"` and will be ignored.
-The arguments `caliper` and `m.order` are not used with `method =
-"optimal"` and will be ignored.
-The arguments `caliper` and `m.order` are not used with `method =
-"optimal"` and will be ignored.
-The arguments `caliper` and `m.order` are not used with `method =
-"optimal"` and will be ignored.
-The arguments `caliper` and `m.order` are not used with `method =
-"optimal"` and will be ignored.
-The arguments `caliper` and `m.order` are not used with `method =
-"optimal"` and will be ignored.
-The arguments `caliper` and `m.order` are not used with `method =
-"optimal"` and will be ignored.
-The arguments `caliper` and `m.order` are not used with `method =
-"optimal"` and will be ignored.
-The arguments `caliper` and `m.order` are not used with `method =
-"optimal"` and will be ignored.
-The arguments `caliper` and `m.order` are not used with `method =
-"optimal"` and will be ignored.
-The arguments `caliper` and `m.order` are not used with `method =
-"optimal"` and will be ignored.</code></pre>
+
 </div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: The argument `m.order` is not used with `method = "optimal"` and will
-be ignored.
-The argument `m.order` is not used with `method = "optimal"` and will
-be ignored.
-The argument `m.order` is not used with `method = "optimal"` and will
-be ignored.
-The argument `m.order` is not used with `method = "optimal"` and will
-be ignored.
-The argument `m.order` is not used with `method = "optimal"` and will
-be ignored.
-The argument `m.order` is not used with `method = "optimal"` and will
-be ignored.
-The argument `m.order` is not used with `method = "optimal"` and will
-be ignored.
-The argument `m.order` is not used with `method = "optimal"` and will
-be ignored.
-The argument `m.order` is not used with `method = "optimal"` and will
-be ignored.
-The argument `m.order` is not used with `method = "optimal"` and will
-be ignored.
-The argument `m.order` is not used with `method = "optimal"` and will
-be ignored.
-The argument `m.order` is not used with `method = "optimal"` and will
-be ignored.</code></pre>
+<div class="cell">
+
 </div>
+<div class="cell">
+
+</div>
+<div class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 2 × 2
   history        `Number of Fires`
   &lt;chr&gt;                      &lt;int&gt;
-1 Non-Defoliated                96
-2 Defoliated                    96</code></pre>
+1 Non-Defoliated                94
+2 Defoliated                    94</code></pre>
 </div>
 </div>
 <div class="cell">
@@ -342,8 +311,8 @@ be ignored.</code></pre>
 <pre><code># A tibble: 2 × 2
   history        `Number of Fires`
   &lt;chr&gt;                      &lt;int&gt;
-1 Non-Defoliated                84
-2 Defoliated                    84</code></pre>
+1 Non-Defoliated               105
+2 Defoliated                   105</code></pre>
 </div>
 </div>
 <div class="cell">
@@ -366,7 +335,7 @@ be ignored.</code></pre>
 </div>
 <div class="cell">
 <div class="cell-output-display">
-<p><img src="fire_insect_co-occurence_report_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid" width="672"></p>
+<p><img src="fire_insect_co-occurence_report_files/figure-html/unnamed-chunk-21-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <div class="cell">
@@ -400,34 +369,34 @@ Supply arguments directly to `.fns` through an anonymous function instead.
 <tbody>
   <tr>
    <td style="text-align:left;"> all </td>
-   <td style="text-align:left;"> 51.18 </td>
-   <td style="text-align:left;"> 12.50 </td>
-   <td style="text-align:left;"> 26.68, 75.69 </td>
-   <td style="text-align:left;"> 4.09 </td>
+   <td style="text-align:left;"> 54.02 </td>
+   <td style="text-align:left;"> 11.97 </td>
+   <td style="text-align:left;"> 30.56, 77.48 </td>
+   <td style="text-align:left;"> 4.51 </td>
    <td style="text-align:left;"> &lt; 0.0001 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> 0-2 years after defoliation </td>
-   <td style="text-align:left;"> 74.70 </td>
-   <td style="text-align:left;"> 15.39 </td>
-   <td style="text-align:left;"> 44.53, 104.87 </td>
-   <td style="text-align:left;"> 4.85 </td>
+   <td style="text-align:left;"> 72.48 </td>
+   <td style="text-align:left;"> 15.91 </td>
+   <td style="text-align:left;"> 41.29, 103.67 </td>
+   <td style="text-align:left;"> 4.55 </td>
    <td style="text-align:left;"> &lt; 0.0001 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> 3-9 years after defoliation </td>
-   <td style="text-align:left;"> 52.93 </td>
-   <td style="text-align:left;"> 17.44 </td>
-   <td style="text-align:left;"> 18.75, 87.1 </td>
-   <td style="text-align:left;"> 3.03 </td>
-   <td style="text-align:left;"> 0.00240589124012744 </td>
+   <td style="text-align:left;"> 100.83 </td>
+   <td style="text-align:left;"> 15.17 </td>
+   <td style="text-align:left;"> 71.11, 130.56 </td>
+   <td style="text-align:left;"> 6.65 </td>
+   <td style="text-align:left;"> &lt; 0.0001 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> 10+ years after defoliation </td>
-   <td style="text-align:left;"> 110.21 </td>
-   <td style="text-align:left;"> 17.11 </td>
-   <td style="text-align:left;"> 76.67, 143.75 </td>
-   <td style="text-align:left;"> 6.44 </td>
+   <td style="text-align:left;"> 108.59 </td>
+   <td style="text-align:left;"> 17.42 </td>
+   <td style="text-align:left;"> 74.45, 142.72 </td>
+   <td style="text-align:left;"> 6.23 </td>
    <td style="text-align:left;"> &lt; 0.0001 </td>
   </tr>
 </tbody>
@@ -458,15 +427,15 @@ Supply arguments directly to `.fns` through an anonymous function instead.
    <td style="text-align:left;"> Mahalanobis distance for matching and a propensity score caliper to ensure close matches </td>
    <td style="text-align:left;"> estimated with logistic regression (glm) </td>
    <td style="text-align:left;"> logit </td>
-   <td style="text-align:left;"> 0.0389301 </td>
+   <td style="text-align:left;"> 0.0583951 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> 3-9 years after defoliation </td>
    <td style="text-align:left;"> 1:1 nearest neighbor matching without replacement </td>
-   <td style="text-align:left;"> Mahalanobis distance for matching and a propensity score caliper to ensure close matches </td>
-   <td style="text-align:left;"> estimated with logistic regression (glm) </td>
-   <td style="text-align:left;"> logit </td>
-   <td style="text-align:left;"> 0.0363848 </td>
+   <td style="text-align:left;"> Mahalanobis </td>
+   <td style="text-align:left;"> estimated with mahalanobis distances </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:left;"> NA </td>
   </tr>
   <tr>
    <td style="text-align:left;"> 10+ years after defoliation </td>
@@ -483,12 +452,12 @@ Supply arguments directly to `.fns` through an anonymous function instead.
 </div>
 </div>
 </section>
-<section id="drivers-of-burn-severity-within-defoliated-fires" class="level4">
-<h4 class="anchored" data-anchor-id="drivers-of-burn-severity-within-defoliated-fires">Drivers of burn severity within defoliated fires</h4>
-<p>The distribution and connectivity of combustible fuels and fire weather jointly influence wildfire dynamics. Under extreme fire weather conditions the effects of fuels are less impactful and their effects do not emerge from models of wildfire behavior (Podur et al 2009). However, following defoliation we expect the impact of fuel to be greater(emerge, etc.). Therefore, we examined the drivers of burn severity within the subset of fires that had a history of defoliation (n = 256). We modeled burn severity as a function of host percentage, cumulative years of defoliation, time since defoliation, and several fire weather indices. Time since defoliation was modeled as a factor with 3 levels corresponding to three windows of opportunity. We included an interaction between cumulative years of defoliation and time since defoliation, as we predict defoliation recurring in successive years will have amplify the impacts of defoliation history depending on the time since defoliation. We fit a generalized least squares (GLS) model with a Gaussian spatial correlation structure, where correlation decreases with distance. Model fit was assessed by plotting residuals against fitted values (Appendix 1), and indicated a good fit with residuals centered around zero. To assess spatial autocorrelation, a variogram of the residuals was computed (Appendix 1) and plotted the spatial distribution of the model residuals <a href="#fig-spatial-residuals">Figure&nbsp;3</a>.</p>
+<section id="spatial-patterns-of-severity-and-recovery-in-defoliated-fires" class="level4">
+<h4 class="anchored" data-anchor-id="spatial-patterns-of-severity-and-recovery-in-defoliated-fires">Spatial patterns of severity and recovery in defoliated fires</h4>
+<p>Based on <em>a priori</em> expectations of east-west variations in vegetation type, composition, and climate, we examined the spatial patterns of burn severity and recovery magnitude for fires with a history of defoliation (n = 256). We modeled burn severity as a function of host percentage, cumulative years of defoliation, time since defoliation, and several fire weather indices. Recovery magnitude was modeled as a function of host percentage, cumulative years of defoliation, time since defoliation, burn severity, mean tempeature and total precipitation.In each model time since defoliation was modeled as a factor with 3 levels corresponding to three windows of opportunity. We included an interaction between cumulative years of defoliation and time since defoliation, as we predict areas where defoliated occurred in successive years will have greater burn severity due to increase fuel loads, and lower recovery magnitude due to increased severity. Therefore we would expect the interaction between cumulative years of defoliation and time since defoliation to reveal hotspots with a high degree of burn severity, or low levels of recovery magnitude. We fit a generalized least squares (GLS) model with a Gaussian spatial correlation structure, where correlation decreases with distance. Model fit was assessed by plotting residuals against fitted values (Appendix 1), and indicated a good fit with residuals centered around zero. To assess spatial autocorrelation, a variogram of the residuals was computed (Appendix 1) and plotted the spatial distribution of the model residuals.</p>
 <div class="cell">
 <div class="cell-output-display">
-<p><img src="fire_insect_co-occurence_report_files/figure-html/full%20model-1.png" class="img-fluid" width="672"></p>
+<p><img src="fire_insect_co-occurence_report_files/figure-html/gls-severity-full%20model-1.png" class="img-fluid" width="672"></p>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Generalized least squares fit by REML
@@ -570,126 +539,86 @@ Degrees of freedom: 256 total; 243 residual</code></pre>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0.2923708</code></pre>
 </div>
+</div>
+<div class="cell">
 <div class="cell-output-display">
-<table class="table table-sm table-striped">
-<colgroup>
-<col style="width: 43%">
-<col style="width: 16%">
-<col style="width: 14%">
-<col style="width: 13%">
-<col style="width: 12%">
-</colgroup>
-<thead>
-<tr class="header">
-<th style="text-align: left;"></th>
-<th style="text-align: right;">Value</th>
-<th style="text-align: right;">Std.Error</th>
-<th style="text-align: right;">t-value</th>
-<th style="text-align: right;">P</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">(Intercept)</td>
-<td style="text-align: right;">1176.9755929</td>
-<td style="text-align: right;">530.1208099</td>
-<td style="text-align: right;">2.2202026</td>
-<td style="text-align: right;">0.0273282</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">host_pct</td>
-<td style="text-align: right;">-1.5525348</td>
-<td style="text-align: right;">0.2885843</td>
-<td style="text-align: right;">-5.3798304</td>
-<td style="text-align: right;">0.0000002</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">isi_90</td>
-<td style="text-align: right;">17.5334607</td>
-<td style="text-align: right;">5.2143913</td>
-<td style="text-align: right;">3.3625134</td>
-<td style="text-align: right;">0.0008971</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">dc_90</td>
-<td style="text-align: right;">-0.0858026</td>
-<td style="text-align: right;">0.1795947</td>
-<td style="text-align: right;">-0.4777567</td>
-<td style="text-align: right;">0.6332529</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">dmc_90</td>
-<td style="text-align: right;">-0.6869557</td>
-<td style="text-align: right;">1.8841229</td>
-<td style="text-align: right;">-0.3646024</td>
-<td style="text-align: right;">0.7157253</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">ffmc_90</td>
-<td style="text-align: right;">-2.1422975</td>
-<td style="text-align: right;">4.0108758</td>
-<td style="text-align: right;">-0.5341221</td>
-<td style="text-align: right;">0.5937453</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">bui_90</td>
-<td style="text-align: right;">1.7555646</td>
-<td style="text-align: right;">2.1552383</td>
-<td style="text-align: right;">0.8145571</td>
-<td style="text-align: right;">0.4161234</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">fwi_90</td>
-<td style="text-align: right;">-4.5344713</td>
-<td style="text-align: right;">3.2587106</td>
-<td style="text-align: right;">-1.3914925</td>
-<td style="text-align: right;">0.1653487</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">x</td>
-<td style="text-align: right;">-1.3299189</td>
-<td style="text-align: right;">2.1546600</td>
-<td style="text-align: right;">-0.6172291</td>
-<td style="text-align: right;">0.5376615</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">y</td>
-<td style="text-align: right;">-16.7355677</td>
-<td style="text-align: right;">9.3424211</td>
-<td style="text-align: right;">-1.7913523</td>
-<td style="text-align: right;">0.0744811</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Cumulative_Years_Defol:window_opp1</td>
-<td style="text-align: right;">0.7751303</td>
-<td style="text-align: right;">2.0653515</td>
-<td style="text-align: right;">0.3753019</td>
-<td style="text-align: right;">0.7077633</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Cumulative_Years_Defol:window_opp2</td>
-<td style="text-align: right;">0.7913425</td>
-<td style="text-align: right;">2.6850602</td>
-<td style="text-align: right;">0.2947206</td>
-<td style="text-align: right;">0.7684590</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Cumulative_Years_Defol:window_opp3</td>
-<td style="text-align: right;">7.7250189</td>
-<td style="text-align: right;">3.4853318</td>
-<td style="text-align: right;">2.2164371</td>
-<td style="text-align: right;">0.0275883</td>
-</tr>
-</tbody>
-</table>
+<div id="fig-spatial-residuals-severity" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="fire_insect_co-occurence_report_files/figure-html/fig-spatial-residuals-severity-1.png" class="img-fluid figure-img" width="672"></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;4: Spatial distribution of model residuals.</figcaption><p></p>
+</figure>
+</div>
 </div>
 </div>
 <div class="cell">
 <div class="cell-output-display">
-<div id="fig-spatial-residuals" class="quarto-figure quarto-figure-center anchored">
+<p><img src="fire_insect_co-occurence_report_files/figure-html/gls-recovery-full%20model-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Generalized least squares fit by REML
+  Model: formula 
+  Data: defol_only 
+      AIC      BIC   logLik
+  2423.02 2465.084 -1199.51
+
+Correlation Structure: Gaussian spatial correlation
+ Formula: ~x + y 
+ Parameter estimate(s):
+      range 
+0.001130419 
+
+Coefficients:
+                                       Value Std.Error   t-value p-value
+(Intercept)                        169.24308 111.84169  1.513238  0.1315
+host_pct                            -0.20985   0.07819 -2.683771  0.0078
+rbr_w_offset                        -0.01891   0.01650 -1.146169  0.2528
+mean_temperature                     1.50741   1.66647  0.904553  0.3666
+sum_precipitation_mm                -0.00582   0.00339 -1.719146  0.0868
+x                                    0.86397   0.49954  1.729536  0.0850
+y                                    0.34613   2.42291  0.142857  0.8865
+Cumulative_Years_Defol:window_opp1   1.66009   0.51589  3.217892  0.0015
+Cumulative_Years_Defol:window_opp2   1.42621   0.70088  2.034885  0.0429
+Cumulative_Years_Defol:window_opp3   1.35028   0.95909  1.407876  0.1604
+
+ Correlation: 
+                                   (Intr) hst_pc rbr_w_ mn_tmp sm_pr_ x     
+host_pct                            0.382                                   
+rbr_w_offset                       -0.111  0.341                            
+mean_temperature                   -0.568 -0.205 -0.121                     
+sum_precipitation_mm                0.165  0.028  0.132 -0.338              
+x                                  -0.233 -0.232  0.039  0.096 -0.007       
+y                                  -0.902 -0.451  0.077  0.351 -0.213  0.562
+Cumulative_Years_Defol:window_opp1 -0.073 -0.108 -0.023 -0.072 -0.023  0.300
+Cumulative_Years_Defol:window_opp2 -0.014 -0.021  0.028 -0.034  0.044  0.081
+Cumulative_Years_Defol:window_opp3 -0.132  0.031 -0.066  0.184 -0.199  0.241
+                                   y      C_Y_D:_1 C_Y_D:_2
+host_pct                                                   
+rbr_w_offset                                               
+mean_temperature                                           
+sum_precipitation_mm                                       
+x                                                          
+y                                                          
+Cumulative_Years_Defol:window_opp1  0.186                  
+Cumulative_Years_Defol:window_opp2  0.027  0.466           
+Cumulative_Years_Defol:window_opp3  0.168  0.563    0.457  
+
+Standardized residuals:
+       Min         Q1        Med         Q3        Max 
+-2.0826102 -0.5156245 -0.1397191  0.2899895  7.6291574 
+
+Residual standard error: 26.31573 
+Degrees of freedom: 256 total; 246 residual</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.1023203</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-spatial-residuals-recovery" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
-<p><img src="fire_insect_co-occurence_report_files/figure-html/fig-spatial-residuals-1.png" class="img-fluid figure-img" width="672"></p>
-<p></p><figcaption class="figure-caption">Figure&nbsp;3: Spatial distribution of model residuals.</figcaption><p></p>
+<p><img src="fire_insect_co-occurence_report_files/figure-html/fig-spatial-residuals-recovery-1.png" class="img-fluid figure-img" width="672"></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;5: Spatial distribution of model residuals.</figcaption><p></p>
 </figure>
 </div>
 </div>
@@ -698,8 +627,301 @@ Degrees of freedom: 256 total; 243 residual</code></pre>
 </section>
 <section id="results" class="level3">
 <h3 class="anchored" data-anchor-id="results">Results</h3>
-<p><em>Defoliation impacts on burn severity</em></p>
-<p>We analyzed the impact of defoliation on burn severity by comparing 330 fires (165 defoliated and 165 non-defoliated) that occurred in the boreal shield of Ontario from 1990 to 2012. We found that fires with a history of defoliation had higher burn severity than fires without a history of defoliation. These results indicate that having a history of defoliation has a significant positive effect on the outcome, with an average effect size of 55.49 <a href="#tbl-att-summary">Table&nbsp;4</a> . When comparing the impacts of defoliation according to different levels of time since defoliation following the “window of opportunity” described by Fleming et al.&nbsp;(2002), the overall average effect (55.50) is lower than the subgroup effects, highlighting that the burn severity is more pronounced when considering specific time frames post-defoliation. Additionally, our results indicate that the impact of defoliation on burn severity is not only immediate but also increases over time <strong>?@fig-subgroup-plot</strong> . The average effect size grows from 73.21 in the first 2 years to 114.11 after 10 years <a href="#tbl-att-summary">Table&nbsp;4</a> .</p>
+<p><em>Defoliation effect estimate on burn severity</em></p>
+<p>We analyzed the impact of defoliation on burn severity by comparing 330 fires (165 defoliated and 165 non-defoliated) that occurred in the boreal shield of Ontario from 1990 to 2012. We found that fires with a history of defoliation had higher burn severity than fires without a history of defoliation. These results indicate that having a history of defoliation has a significant positive effect on the outcome, with an average effect size of 55.49 <a href="#tbl-att-summary">Table&nbsp;4</a>. When comparing the impacts of defoliation according to different levels of time since defoliation following the “window of opportunity” described by Fleming et al.&nbsp;(2002), the overall average effect (55.50) is lower than the subgroup effects, highlighting that the burn severity is more pronounced when considering specific time frames post-defoliation. Additionally, our results indicate that the impact of defoliation on burn severity is not only immediate but also increases over time <strong>?@fig-subgroup-plot</strong>. The average effect size grows from 73.21 in the first 2 years to 114.11 after 10 years <a href="#tbl-att-summary">Table&nbsp;4</a>.</p>
+<p><em>Spatial patterns of burn severity</em></p>
+<p>We assessed the spatial distribution of burn severity of all 256 defoliated fires that burned in the boreal shield of Ontario from 1990 to 2012 using a GLS model with a Gaussian correlation structure which incorporated the effects of defoliation and climate variables. The spatial correlation structure indicates a range parameter estimate of 0.0444, suggesting a relatively short spatial correlation range (Appendix 1) <strong>?@fig-spatial-residuals</strong>. This implies that spatial autocorrelation is present but diminishes quickly over distance. The spatial distribution of model residuals <strong>?@fig-spatial-residuals</strong>, reveals no obvious patterns of burn severity from east-to-west. We found that the significant predictors identified in the model, such as the percentage of host species (host %), Initial Spread Index, and interaction between cumulative years defoliated and time since defoliation (10-15 years) <a href="#tbl-gls-severity">Table&nbsp;6</a>, remain influential even after accounting for spatial autocorrelation. Percentage of host species (Host %) was found to have a significant negative effect on burn severity, indicating that higher percentages of host species within a fire are associated with lower burn severity <a href="#tbl-gls-severity">Table&nbsp;6</a>. Initial spread Index showed a significant positive effect on burn severity, suggesting under conditions favouring a higher rate of spread we observed an increased burn severity <a href="#tbl-gls-severity">Table&nbsp;6</a>. Among the defoliation variables, the interaction term cumulative years defoliated and time since defoliation (10-15 years) was significant, and implies that areas defoliated for 10-15 years exhibit higher burn severity compared to other periods. While all other variables did not show a significant impact on burn severity.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="tbl-gls-severity" class="anchored">
+<table class="table table-sm table-striped">
+<caption>Table&nbsp;6: Results from Generalized Least Squares (GLS) model with Gaussian correlation structure assessing the effects of defoliation and climate covariates on burn severity, accounting for spatial autocorrelation in residuals.</caption>
+<colgroup>
+<col style="width: 56%">
+<col style="width: 10%">
+<col style="width: 8%">
+<col style="width: 9%">
+<col style="width: 10%">
+<col style="width: 4%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Covariates</th>
+<th style="text-align: right;">estimate</th>
+<th style="text-align: right;">se ±</th>
+<th style="text-align: right;">t-value</th>
+<th style="text-align: left;">p</th>
+<th style="text-align: left;"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">(Intercept)</td>
+<td style="text-align: right;">1176.98</td>
+<td style="text-align: right;">530.12</td>
+<td style="text-align: right;">2.22</td>
+<td style="text-align: left;">0.03</td>
+<td style="text-align: left;">*</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Host %</td>
+<td style="text-align: right;">-1.55</td>
+<td style="text-align: right;">0.29</td>
+<td style="text-align: right;">-5.38</td>
+<td style="text-align: left;">&lt; 0.0001</td>
+<td style="text-align: left;">***</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Initial Spread Index</td>
+<td style="text-align: right;">17.53</td>
+<td style="text-align: right;">5.21</td>
+<td style="text-align: right;">3.36</td>
+<td style="text-align: left;">&lt; 0.0001</td>
+<td style="text-align: left;">***</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Drought Code</td>
+<td style="text-align: right;">-0.09</td>
+<td style="text-align: right;">0.18</td>
+<td style="text-align: right;">-0.48</td>
+<td style="text-align: left;">0.63</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Duff Moisture Code</td>
+<td style="text-align: right;">-0.69</td>
+<td style="text-align: right;">1.88</td>
+<td style="text-align: right;">-0.36</td>
+<td style="text-align: left;">0.72</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Fine Fuel Moisture Code</td>
+<td style="text-align: right;">-2.14</td>
+<td style="text-align: right;">4.01</td>
+<td style="text-align: right;">-0.53</td>
+<td style="text-align: left;">0.59</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Build Up Index</td>
+<td style="text-align: right;">1.76</td>
+<td style="text-align: right;">2.16</td>
+<td style="text-align: right;">0.81</td>
+<td style="text-align: left;">0.42</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Fire Weather Index</td>
+<td style="text-align: right;">-4.53</td>
+<td style="text-align: right;">3.26</td>
+<td style="text-align: right;">-1.39</td>
+<td style="text-align: left;">0.17</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Longitude</td>
+<td style="text-align: right;">-1.33</td>
+<td style="text-align: right;">2.15</td>
+<td style="text-align: right;">-0.62</td>
+<td style="text-align: left;">0.54</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Latitude</td>
+<td style="text-align: right;">-16.74</td>
+<td style="text-align: right;">9.34</td>
+<td style="text-align: right;">-1.79</td>
+<td style="text-align: left;">0.07</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Years Defoliated × 0-2 Years Since Defoliation</td>
+<td style="text-align: right;">0.78</td>
+<td style="text-align: right;">2.07</td>
+<td style="text-align: right;">0.38</td>
+<td style="text-align: left;">0.71</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Years Defoliated × 3-10 Years Since Defoliation</td>
+<td style="text-align: right;">0.79</td>
+<td style="text-align: right;">2.69</td>
+<td style="text-align: right;">0.29</td>
+<td style="text-align: left;">0.77</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Years Defoliated × 10-15 Years Since Defoliation</td>
+<td style="text-align: right;">7.73</td>
+<td style="text-align: right;">3.49</td>
+<td style="text-align: right;">2.22</td>
+<td style="text-align: left;">0.03</td>
+<td style="text-align: left;">*</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<p><em>Defoliation effect estimate on recovery magnitude</em></p>
+<p>We analyzed the impact of defoliation on recovery magnitude by comparing 308 fires (154 defoliated and 154 non-defoliated) that occurred in the boreal shield of Ontario from 1990 to 2012. We found a significant negative impact of defoliation on recovery following a wildfire across all examined time periods. The overall average defoliation effect (ATE) was -24.34 <a href="#tbl-att-summary-recovery">Table&nbsp;7</a>. Across all examined time periods of time since defoliation, we observed a significant negative trend in recovery magnitude <a href="#fig-subgroup-recovery">Figure&nbsp;6</a>. In the first 0-2 years post-defoliation, the ATE was -16.14. For the period 3-9 years after defoliation, the ATE was -17.96. Even 10+ years post-defoliation, the negative effect on recovery persisted, with an ATE of -19.69. The consistently negative effect indicates that defoliation hinders recovery regardless of defoliation occurring over short and long-term periods .These results underscore the long-term detrimental effects of defoliation on recovery following a wildfire.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-subgroup-recovery" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="fire_insect_co-occurence_report_files/figure-html/fig-subgroup-recovery-1.png" class="img-fluid figure-img" width="672"></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;6: <strong>?(caption)</strong></figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-subgroup-plot-recovery" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="fire_insect_co-occurence_report_files/figure-html/fig-subgroup-plot-recovery-1.png" class="img-fluid figure-img" width="672"></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;7: Average treatment effect (ATT) estimates and their lower (2.5%) and upper (97.5%) confidence intervals for the effects of defoliation for entire dataset (all) and across all levels of time since defoliation.</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div id="tbl-att-summary-recovery" class="anchored">
+
+<table class="table" style=""><caption>Table&nbsp;7:  Average defoliation effect on Burn Severity based on defolation status (window of opportunity) </caption>
+ <thead>
+  <tr>
+   <th style="text-align:left;"> Subgroup </th>
+   <th style="text-align:left;"> estimate </th>
+   <th style="text-align:left;"> se ± </th>
+   <th style="text-align:left;"> 95% CI </th>
+   <th style="text-align:left;"> statistic </th>
+   <th style="text-align:left;"> p </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> all </td>
+   <td style="text-align:left;"> -25.48 </td>
+   <td style="text-align:left;"> 3.42 </td>
+   <td style="text-align:left;"> -32.17, -18.79 </td>
+   <td style="text-align:left;"> -7.46 </td>
+   <td style="text-align:left;"> &lt; 0.0001 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> 0-2 years after defoliation </td>
+   <td style="text-align:left;"> -17.65 </td>
+   <td style="text-align:left;"> 5.95 </td>
+   <td style="text-align:left;"> -29.32, -5.98 </td>
+   <td style="text-align:left;"> -2.96 </td>
+   <td style="text-align:left;"> 0.003 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> 3-9 years after defoliation </td>
+   <td style="text-align:left;"> -18.20 </td>
+   <td style="text-align:left;"> 3.35 </td>
+   <td style="text-align:left;"> -24.77, -11.62 </td>
+   <td style="text-align:left;"> -5.43 </td>
+   <td style="text-align:left;"> &lt; 0.0001 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> 10+ years after defoliation </td>
+   <td style="text-align:left;"> -20.91 </td>
+   <td style="text-align:left;"> 2.97 </td>
+   <td style="text-align:left;"> -26.73, -15.08 </td>
+   <td style="text-align:left;"> -7.03 </td>
+   <td style="text-align:left;"> &lt; 0.0001 </td>
+  </tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div id="tbl-sugroup-best-model-recovery" class="anchored">
+
+<table class="table" style=""><caption>Table&nbsp;8:  Matching parameters for subgroup models chosen based on best covariate balance of all covariates with SMD &lt;0.25. </caption>
+ <thead>
+  <tr>
+   <th style="text-align:left;"> Subgroup </th>
+   <th style="text-align:left;"> Method </th>
+   <th style="text-align:left;"> Matching </th>
+   <th style="text-align:left;"> Distance </th>
+   <th style="text-align:left;"> Link </th>
+   <th style="text-align:left;"> Caliper </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> 10+ years after defoliation </td>
+   <td style="text-align:left;"> 1:1 nearest neighbor matching without replacement </td>
+   <td style="text-align:left;"> Propensity Score </td>
+   <td style="text-align:left;"> estimated with logistic regression (glm) </td>
+   <td style="text-align:left;"> logit </td>
+   <td style="text-align:left;"> 0.0213445 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> 10+ years after defoliation </td>
+   <td style="text-align:left;"> 1:1 nearest neighbor matching without replacement </td>
+   <td style="text-align:left;"> Propensity Score </td>
+   <td style="text-align:left;"> estimated with logistic regression (glm) </td>
+   <td style="text-align:left;"> logit </td>
+   <td style="text-align:left;"> 0.0563714 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> 10+ years after defoliation </td>
+   <td style="text-align:left;"> 1:1 nearest neighbor matching without replacement </td>
+   <td style="text-align:left;"> Propensity Score </td>
+   <td style="text-align:left;"> estimated with logistic regression (glm) </td>
+   <td style="text-align:left;"> logit </td>
+   <td style="text-align:left;"> 0.0533118 </td>
+  </tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p><em>Spatial patterns of recovery magnitude</em></p>
+<p>We assessed the spatial distribution of recovery magnitude of all 256 defoliated fires that burned in the boreal shield of Ontario from 1990 to 2012 using a GLS model with a Gaussian correlation structure which incorporated the effects of defoliation, burn severity and post-fire recovery climate. The spatial distribution of model residuals revealed no obvious patterns <a href="#fig-spatial-residuals-recovery">Figure&nbsp;5</a>, and the spatial correlation structure indicated a range parameter estimate of 0.0011, suggesting a very short spatial correlation range. Significant predictors identified in the model included the percentage of host species and cumulative years of defoliation in the first and second windows. The percentage of host species within a fire had a significant negative effect on recovery magnitude, indicating that higher percentages of host species are associated with lower recovery magnitude. Cumulative years of defoliation in the first window and in the second window showed significant positive effects on recovery magnitude, suggesting that defoliation over these periods is associated with higher recovery magnitude. Other variables, such as mean temperature, sum precipitation, and burn severity, did not show significant effects. These results highlight the significant influence of host plant percentage and cumulative years of defoliation on recovery magnitude, while other factors did not show significant impacts.</p>
+</section>
+<section id="discussion" class="level3">
+<h3 class="anchored" data-anchor-id="discussion">Discussion</h3>
+<p>Our findings highlight the important role of spatial legacies of spruce budworm defoliation on exacerbating the impacts of wildfire on post-fire biomass and soil change (burn severity) and recovery capacity and reveal variability in the impactfulness of spatial legacies based on the amount, duration of, and time since defoliation. Our resutls</p>
+<p>Goals:</p>
+<ul>
+<li><p>Present principles, relationships and generalizations shown by the results</p></li>
+<li><p>Point out exceptions or lack of correlations. Define why you think this is so.</p></li>
+<li><p>Show how your results agree or disagree with previously published works</p></li>
+<li><p>Discuss the theoretical implications of your work as well as practical applications</p></li>
+<li><p>State your conclusions clearly. Summarize your evidence for each conclusion.</p></li>
+<li><p>Discuss the significance of the results</p></li>
+</ul>
+<p>checklist</p>
+<ul>
+<li><p>Evidence does not explain itself; the results must be presented and then explained.</p></li>
+<li><p>Typical stages in the discussion: summarizing the results, discussing whether results are expected or unexpected, comparing these results to previous work, interpreting and explaining the results (often by comparison to a theory or model), and hypothesizing about their generality.</p></li>
+<li><p>Discuss any problems or shortcomings encountered during the course of the work.</p></li>
+<li><p>Discuss possible alternate explanations for the results.</p></li>
+<li><p>Avoid: presenting results that are never discussed; presenting discussion that does not relate to any of the results; presenting results and discussion in chronological order rather than logical order; ignoring results that do not support the conclusions; drawing conclusions from results without logical arguments to back them up.&nbsp;</p></li>
+</ul>
+</section>
+<section id="conclusion" class="level3">
+<h3 class="anchored" data-anchor-id="conclusion">Conclusion</h3>
+<p>checklist</p>
+<ul>
+<li><p>Provide a very brief summary of the Results and Discussion.</p></li>
+<li><p>Emphasize the implications of the findings, explaining how the work is significant and providing the key message(s) the author wishes to convey.</p></li>
+<li><p>Provide the most general claims that can be supported by the evidence.</p></li>
+<li><p>Provide a future perspective on the work.</p></li>
+<li><p>Avoid: repeating the abstract; repeating background information from the Introduction; introducing new evidence or new arguments not found in the Results and Discussion; repeating the arguments made in the Results and Discussion; failing to address all of the research questions set out in the Introduction.&nbsp;</p></li>
+</ul>
+<p>These findings highlight the critical roles of host presence, initial spread conditions, and long-term defoliation in influencing burn severity. The model underscores the importance of considering both biotic and abiotic factors, as well as their interactions, in understanding and predicting burn severity in forested landscapes.</p>
+<p>Overall, the model effectively captures the spatial distribution of burn severity, highlighting the importance of considering spatial autocorrelation in ecological studies.</p>
 </section>
 <section id="host-species-percentage" class="level3">
 <h3 class="anchored" data-anchor-id="host-species-percentage">Host species percentage</h3>
@@ -708,7 +930,7 @@ Degrees of freedom: 256 total; 243 residual</code></pre>
 <div class="cell-output-display">
 <div id="tbl-host-species-percentage" class="anchored">
 
-<table class="table" style="margin-left: auto; margin-right: auto;"><caption>Table&nbsp;6:  Distribution of Host Species Percentage between Wildfire-Insect co-occurrence </caption>
+<table class="table" style="margin-left: auto; margin-right: auto;"><caption>Table&nbsp;9:  Distribution of Host Species Percentage between Wildfire-Insect co-occurrence </caption>
  <thead>
   <tr>
    <th style="text-align:center;"> Host Percent </th>
