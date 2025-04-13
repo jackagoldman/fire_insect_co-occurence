@@ -40,6 +40,11 @@ m.data %>%
   mutate(history = case_when(history ==1 ~ "Defoliated",
                              history ==0 ~"Non-Defoliated"))
 
+
+#save matched data
+write.csv(m.data, "/home/goldma34/fire_insect_co-occurence/data/outputs/on/on_sev_match_data.csv")
+
+
 # Convert the data frame to an sf object
 m.data.sf <- st_as_sf(m.data, coords = c("x", "y"), crs = 4326)
 
@@ -221,6 +226,9 @@ m.data.rec %>%
   summarise("Number of Fires" = n()) %>% 
   mutate(history = case_when(history ==1 ~ "Defoliated",
                              history ==0 ~"Non-Defoliated"))
+
+
+write.csv(m.data.rec, "/home/goldma34/fire_insect_co-occurence/data/outputs/on/on_rec_match_data.csv")
 
 # Convert the data frame to an sf object
 m.data.rec.sf <- st_as_sf(m.data.rec, coords = c("x", "y"), crs = 4326)
