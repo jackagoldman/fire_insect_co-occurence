@@ -54,11 +54,11 @@ history <- history %>%
 history <- history %>% 
   left_join(topo, by = "Fire_ID")
 
-#
+# filter overlap percent to greater than 90
 history_gt90 <- history %>% 
   filter(!(Max_Overlap_Percent <= 90 & history ==1 ))
 
-#
+#history greater than 90% as spatial object
 h90.sf <- st_as_sf(history_gt90, coords = c("x", "y"), crs = 4326)
 
 #sbw history
@@ -87,3 +87,13 @@ hist_gt90_1 <- subset(history_gt90, window_opp == "0" | window_opp == "1")
 hist_gt90_2  <- subset(history_gt90, window_opp == "0" | window_opp == "2")
 hist_gt90_3 <- subset(history_gt90, window_opp == "0" | window_opp == "3")
 hist_gt90_4 <- subset(history_gt90, window_opp == "0" | window_opp == "4")
+
+
+# load matched data
+# matched data sf sev
+m.data <- read.csv("/home/goldma34/fire_insect_co-occurence/data/outputs/on/on_sev_match_data.csv")
+m.data.sev_sf <- st_as_sf(m.data, coords = c("x", "y"), crs = 4326)
+# matched data sf rec
+# Convert the data frame to an sf object
+m.data.rec <- read.csv("/home/goldma34/fire_insect_co-occurence/data/outputs/on/on_rec_match_data.csv")
+m.data.rec_sf <- st_as_sf(m.data.rec, coords = c("x", "y"), crs = 4326)
