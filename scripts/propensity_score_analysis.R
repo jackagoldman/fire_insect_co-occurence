@@ -167,7 +167,7 @@ plot.p.sev_all <- ggplot(p.sev_all, aes(x = history, y = estimate, color = histo
   geom_point(size = 4) +
   geom_errorbar(aes(ymin = conf.low, ymax = conf.high), width = 0.2) +
   labs(y = "Burn Severity", x = "Defoliation History", color = "History") +
-  scale_x_discrete(labels = c("Non-Defoliated", "Defoliated")) +
+  scale_x_discrete(labels = c("Defoliated", "Non-Defoliated")) +
   scale_color_manual(values = c("Defoliated" = "#FF8C00A0", "Non-Defoliated" = "#8B0000A0")) +
   theme_bw()+
   theme(legend.position = "none")
@@ -201,8 +201,9 @@ plot(sev.sensitivity)
 # plot extreme scenario
 plot(sev.sensitivity, type = "extreme")
 
-
+#####################################
 # Part 2: RECOVERY ==============================
+######################################
 
 ## Propensity score matching for full recovery Data --------------------------
 
@@ -359,5 +360,8 @@ plot(rec.sensitivity)
 
 # plot extreme scenario
 plot(rec.sensitivity, type = "extreme")
+
+
+
 
 
