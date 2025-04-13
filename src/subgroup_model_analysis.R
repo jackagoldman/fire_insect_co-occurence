@@ -815,3 +815,11 @@ if (!is.null(best_model_rec_4)) {
 
 source("/home/goldma34/fire_insect_co-occurence/src/treatment_effect_plots.R")
 generate_all_treatment_effect_plots()
+
+#============================
+# GENERATE TREATMENT EFFECT TABLES
+#============================
+
+source("/home/goldma34/fire_insect_co-occurence/src/export_treatment_effects.R")
+export_all_treatment_effects()
+
