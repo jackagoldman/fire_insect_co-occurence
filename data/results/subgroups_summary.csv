@@ -1,0 +1,9 @@
+"Subgroup","Response_Type","Time_Period","Model_Found"
+"Subgroup 1","Severity","0-2 years",TRUE
+"Subgroup 2","Severity","3-5 years",TRUE
+"Subgroup 3","Severity","6-9 years",TRUE
+"Subgroup 4","Severity","10+ years",TRUE
+"Subgroup 1","Recovery","0-2 years",TRUE
+"Subgroup 2","Recovery","3-5 years",TRUE
+"Subgroup 3","Recovery","6-9 years",TRUE
+"Subgroup 4","Recovery","10+ years",TRUE

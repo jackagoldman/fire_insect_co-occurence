@@ -1,0 +1,9 @@
+"Subgroup","Model_Found","Method","Distance","Link","M_Order","Caliper","Replace","Use_Mahvars","Response","Sample_Size_Treated","Sample_Size_Control","Total_Sample_Size"
+"Subgroup 1 (0-2 years) - Severity",TRUE,"nearest","glm","probit","random",0.1,FALSE,"TRUE","severity",90,90,180
+"Subgroup 2 (3-5 years) - Severity",TRUE,"nearest","glm","logit","random",0.2,FALSE,"FALSE","severity",20,20,40
+"Subgroup 3 (6-9 years) - Severity",TRUE,"nearest","glm","probit","random",0.3,FALSE,"TRUE","severity",24,24,48
+"Subgroup 4 (10+ years) - Severity",TRUE,"nearest","glm","probit","random",0.2,FALSE,"FALSE","severity",49,49,98
+"Subgroup 1 (0-2 years) - Recovery",TRUE,"nearest","glm","probit","random",0.1,FALSE,"TRUE","recovery",83,83,166
+"Subgroup 2 (3-5 years) - Recovery",TRUE,"nearest","glm","logit","random",0.1,FALSE,"TRUE","recovery",18,18,36
+"Subgroup 3 (6-9 years) - Recovery",TRUE,"nearest","glm","probit","random",0.1,FALSE,"FALSE","recovery",21,21,42
+"Subgroup 4 (10+ years) - Recovery",TRUE,"nearest","glm","logit","random",0.1,FALSE,"FALSE","recovery",37,37,74
