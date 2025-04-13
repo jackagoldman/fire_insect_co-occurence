@@ -807,3 +807,11 @@ if (!is.null(best_model_rec_4)) {
   # Add to the saveRDS statements
   saveRDS(fit.rec_4r2, "/home/goldma34/fire_insect_co-occurence/data/results/fit_model_subgroup4_recovery_r2.RDS")
 }
+
+
+#============================
+# GENERATE TREATMENT EFFECT PLOTS
+#============================
+
+source("/home/goldma34/fire_insect_co-occurence/src/treatment_effect_plots.R")
+generate_all_treatment_effect_plots()
