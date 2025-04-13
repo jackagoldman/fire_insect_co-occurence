@@ -1,6 +1,7 @@
 # Required Data - prep 
 
 library(dplyr)
+library(sf)
 
 # read in history data
 history = read.csv("/home/goldma34/fire_insect_co-occurence/data/outputs/on/on_defoliation_history_wx.csv")
