@@ -47,7 +47,7 @@ inset_pie1 <- ggplot(inset_data1, aes(x = "", y = count, fill = factor(history))
   geom_text(aes(label = count), position = position_stack(vjust = 0.5), size = 3)  # Adjust the size here
 
 # Create the inset pie chart for m.data.sf2
-inset_data2 <- m.data.sf %>%
+inset_data2 <- m.data.sev_sf %>%
   group_by(history) %>%
   summarise(count = n())
 
@@ -85,7 +85,7 @@ map1 <- ggplot() +
 # Create the second map with inset using m.data.sf2
 map2 <- ggplot() +
   geom_sf(data = ontario, fill = "navajowhite1", color = "black") +
-  geom_sf(data = m.data.sf, aes(color = factor(history)), size = 1) +
+  geom_sf(data = m.data.sev_sf, aes(color = factor(history)), size = 1) +
   scale_color_manual(values = c("0" = "#FF8C00A0", "1" = "#8B0000A0"), 
                      name = NULL, 
                      labels = c("0" = "Non-Defoliated", "1" = "Defoliated"),
@@ -118,17 +118,37 @@ combined_plot <- plot_grid(
   rel_heights = c(0.1, 1)
 )
 
+
+# save each plot inidividually
+ggsave(
+  filename = "/home/goldma34/fire_insect_co-occurence/plots/maps/study_area_unmatched.png",
+  plot = map1,
+  width = 12,
+  height = 8,
+  dpi = 300
+)
+ggsave(
+  filename = "/home/goldma34/fire_insect_co-occurence/plots/maps/study_area_matched_severity.png",
+  plot = map2,
+  width = 12,
+  height = 8,
+  dpi = 300
+)
+
 # Save the combined plot    
 ggsave(
-  filename = "/home/goldma34/fire_insect_co-occurence/data/figures/fig_1_map.png",
+  filename = "/home/goldma34/fire_insect_co-occurence/plots/maps/fig_1_study_area_and_sev_matched.png",
   plot = combined_plot,
   width = 12,
   height = 8,
   dpi = 300
 )
 
+######################################
+# SPATIAL DISTRIBUTION MODELS
+######################################
 
-# defol dataset
+# defol dataset - models are for defolaited only fires, make two dataframes for attach residuals and plotting
 defol_only_sev <- subset(history_gt90, history == 1)
 defol_only_rec <- subset(history_gt90, history == 1)
 
@@ -136,23 +156,47 @@ defol_only_rec <- subset(history_gt90, history == 1)
 # Part 1: SEVERITY ======================
 ########################################
 # Define the model formula
-formula <- rbr_w_offset ~host_pct +  Cumulative_Years_Defol:window_opp + isi_90 + 
+formula.sev <- rbr_w_offset ~host_pct +  Cumulative_Years_Defol:window_opp + isi_90 + 
   dc_90 + dmc_90 + ffmc_90 + bui_90+ fwi_90 + mean_tri+  x + y 
 
 # Fit the model using nlme with spatial correlation, where correlation decreases with distance
 # gls
 # Fit the model using nlme with spatial correlation, where correlation decreases with distance
-model_gls <- gls(formula,
+model_gls <- gls(formula.sev,
                  correlation = corGaus(form = ~ x + y), 
                  data = defol_only_sev,
                  control = list(singular.ok = TRUE))
 
-# Check for multicollinearity
+# Check for multicollinearity - remove anything > 10
 print(vif(model_gls))
 
-
 # Residuals vs. Fitted Values Plot
-resid_plot_severity <- plot(fitted(model_gls), resid(model_gls)) +abline(h = 0, col = "red") # fit is good
+
+# With these lines:
+resid_data <- data.frame(
+  fitted = fitted(model_gls),
+  residuals = resid(model_gls)
+)
+
+resid_plot_severity <- ggplot(resid_data, aes(x = fitted, y = residuals)) +
+  geom_point(alpha = 0.6) +
+  geom_hline(yintercept = 0, color = "red", linetype = "solid") +
+  labs(
+    title = "Residuals vs Fitted Values",
+    x = "Fitted Values",
+    y = "Residuals"
+  ) +
+  theme_bw()
+
+
+#save residuals plot 
+ggsave(
+  filename = "/home/goldma34/fire_insect_co-occurence/plots/supplementary_materials/residuals_fitted_severity.png",
+  plot = resid_plot_severity,
+  width = 12,
+  height = 8,
+  dpi = 300
+)
 
 # Display the model summary
 summary(model_gls)
@@ -175,33 +219,64 @@ variogram_gls <- variogram(residuals_gls ~ 1, data = defol_only_sev)
 var_plot <- plot(variogram_gls, main = "Variogram of Residuals (Gaussian)")
 
 # confirm defol_only as dataframe
-df <- as.data.frame(defol_only_sev)
+df.sev <- as.data.frame(defol_only_sev)
 
 # Create a spatial plot of residuals
-ggplot() +
+spat.resid.sev_plot <- ggplot() +
   geom_sf(data = ontario, fill = "navajowhite1", color = "black") +
-  geom_point(data = df, aes(x = x, y = y, color = residuals_gls)) +
+  geom_point(data = df.sev, aes(x = x, y = y, color = residuals_gls)) +
   scale_color_gradient2(low = "#88CCEEA0", mid = "white", high = "#8B0000A0", midpoint = 0) +
   labs(title = NULL, x = "Longitude", y = "Latitude", color = "Residuals") +
   theme_bw()
 
+
+# save spatial plot of residuals
+ggsave(
+  filename = "/home/goldma34/fire_insect_co-occurence/plots/maps/residuals_map_severity.png",
+  plot = spat.resid.sev_plot ,
+  width = 12,
+  height = 8,
+  dpi = 300
+)
 # Part 2: RECOVERY ==================
 
 # Define the model formula
-formula <- recovery ~host_pct +  Cumulative_Years_Defol:window_opp + rbr_w_offset +
+formula.rec <- recovery ~host_pct +  Cumulative_Years_Defol:window_opp + rbr_w_offset +
   mean_temperature + sum_precipitation_mm + mean_tri+ x + y 
 
 # Fit the model using nlme with spatial correlation, where correlation decreases with distance
 # gls
 
-model_gls_rec <- gls(formula,
+model_gls_rec <- gls(formula.rec,
                      correlation = corGaus(form = ~ x + y), 
                      data = defol_only_rec)
 
 # Residuals vs. Fitted Values Plot
-residual_plot_rec <- plot(fitted(model_gls_rec), resid(model_gls_rec)) +abline(h = 0, col = "red") # fit is good
+# With these lines:
+resid.rec_data <- data.frame(
+  fitted = fitted(model_gls_rec),
+  residuals = resid(model_gls_rec)
+)
+
+resid_plot_recovery <- ggplot(resid.rec_data, aes(x = fitted, y = residuals)) +
+  geom_point(alpha = 0.6) +
+  geom_hline(yintercept = 0, color = "red", linetype = "solid") +
+  labs(
+    title = "Residuals vs Fitted Values",
+    x = "Fitted Values",
+    y = "Residuals"
+  ) +
+  theme_bw()
 
 
+#save residuals plot 
+ggsave(
+  filename = "/home/goldma34/fire_insect_co-occurence/plots/supplementary_materials/residuals_fitted_recovery.png",
+  plot = resid_plot_recovery,
+  width = 12,
+  height = 8,
+  dpi = 300
+)
 
 # Display the model summary
 summary(model_gls_rec)
@@ -227,9 +302,20 @@ var_plot_rec <- plot(variogram_gls_rec, main = "Variogram of Residuals (Gaussian
 df_rec <- as.data.frame(defol_only_rec)
 
 # Create a spatial plot of residuals
-ggplot() +
+spat.resid.rec_plot <-ggplot() +
   geom_sf(data = ontario, fill = "navajowhite1", color = "black") +
   geom_point(data = df_rec, aes(x = x, y = y, color = residuals_gls_rec)) +
   scale_color_gradient2(low = "#88CCEEA0", mid = "white", high = "#8B0000A0", midpoint = 0) +
   labs(title = NULL, x = "Longitude", y = "Latitude", color = "Residuals") +
   theme_bw()
+
+
+
+# save spatial plot of residuals
+ggsave(
+  filename = "/home/goldma34/fire_insect_co-occurence/plots/maps/residuals_map_recovery.png",
+  plot = spat.resid.rec_plot,
+  width = 12,
+  height = 8,
+  dpi = 300
+)
