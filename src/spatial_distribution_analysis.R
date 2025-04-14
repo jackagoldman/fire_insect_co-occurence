@@ -16,7 +16,7 @@ library(cowplot)
 
 
 # Load your data 
-source("/home/goldma34/fire_insect_co-occurence/src/load_data.R")  # Replace with actual script that loads hist_gt90_1
+source("/home/goldma34/fire_insect_co-occurence/src/load_data.R")  # Replace with actual script that loads hist_gt90_1 # nolint: line_length_linter.
 
 #load
 source("/home/goldma34/fire_insect_co-occurence/src/find_best_model.R") 
