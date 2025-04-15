@@ -11,7 +11,7 @@ source("/home/goldma34/fire_insect_co-occurence/src/best_model_functions.R")
 source("/home/goldma34/fire_insect_co-occurence/src/covariate_balance_plots.R")
 
 # Load your data 
-source("/home/goldma34/fire_insect_co-occurence/src/load_data.R")  # Replace with actual script that loads hist_gt90_1
+source("/home/goldma34/fire_insect_co-occurence/src/load_data.R")
 
 # Check if data is loaded
 if (!exists("hist_gt90_1")) {
@@ -77,9 +77,9 @@ if (!is.null(best_model_sev_1)) {
 
   # Save results
   cat("\nSaving results...\n")
-  saveRDS(best_model_sev_1, "/home/goldma34/fire_insect_co-occurence/data/results/best_model_subgroup1_severity.RDS")
-  saveRDS(fit.sev_1, "/home/goldma34/fire_insect_co-occurence/data/results/fit_model_subgroup1_severity.RDS")
-  saveRDS(fit.sev_1r2, "/home/goldma34/fire_insect_co-occurence/data/results/fit_model_subgroup1_severity_r2.RDS")
+  saveRDS(best_model_sev_1, "/home/goldma34/fire_insect_co-occurence/data/results/best_model_subgroup1_severity.RDS") # nolint: line_length_linter.
+  saveRDS(fit.sev_1, "/home/goldma34/fire_insect_co-occurence/data/results/fit_model_subgroup1_severity.RDS") # nolint: line_length_linter.
+  saveRDS(fit.sev_1r2, "/home/goldma34/fire_insect_co-occurence/data/results/fit_model_subgroup1_severity_r2.RDS") # nolint # nolint: line_length_linter.
 } else {
   cat("No suitable severity model found for subgroup 1. Try different parameters.\n")
 }
@@ -823,3 +823,85 @@ generate_all_treatment_effect_plots()
 source("/home/goldma34/fire_insect_co-occurence/src/export_treatment_effects.R")
 export_all_treatment_effects()
 
+
+
+#============================
+# pwr analysis
+#============================
+
+#Power analysis based on observed effect size
+library(pwr)
+
+fit.sev_3 <- readRDS("/home/goldma34/fire_insect_co-occurence/data/results/fit_model_subgroup3_severity.RDS")
+best_model_sev_3 <- readRDS("/home/goldma34/fire_insect_co-occurence/data/results/best_model_subgroup3_severity.RDS")
+m.data.sev_3 <- match_data(best_model_sev_3)
+
+
+# Extract your observed effect and standard error from your model
+# Example: fit.sev_2 <- lm(rbr_w_offset ~ history + host_pct + ...)
+model_summary <- summary(fit.sev_3)
+treatment_coef <- coef(model_summary)["history", ]
+observed_effect <- treatment_coef["Estimate"]
+observed_se <- treatment_coef["Std. Error"]
+
+# Calculate Cohen's d effect size
+d <- observed_effect / sd(m.data.sev_3$rbr_w_offset)
+
+# Calculate power for different sample sizes
+sample_sizes <- seq(20, 300, by = 10)
+powers <- sapply(sample_sizes, function(n) {
+  pwr.t.test(d = d, n = n/2, sig.level = 0.05, type = "two.sample", alternative = "two.sided")$power
+})
+
+# Create power curve plot
+power_data <- data.frame(sample_size = sample_sizes, power = powers)
+power_plot <- ggplot(power_data, aes(x = sample_size, y = power)) +
+  geom_line() +
+  geom_hline(yintercept = 0.8, linetype = "dashed") +
+  scale_y_continuous(limits = c(0, 1)) +
+  labs(
+    x = "Total Sample Size", 
+    y = "Statistical Power",
+    title = paste("Power Analysis based on Observed Effect Size (d =", round(d, 2), ")")
+  ) +
+  theme_minimal()
+print(power_plot)
+
+# Find required sample size for power = 0.8
+min_sample_size <- sample_sizes[min(which(powers >= 0.8))]
+cat("Minimum sample size required for 80% power:", min_sample_size, "\n")
+
+
+#source pwr analysis
+source("/home/goldma34/fire_insect_co-occurence/src/power_analysis.R")
+
+# Example usage:
+if (!exists("fit.sev_3") || !exists("m.data.sev_3")) {
+  fit.sev_3 <- readRDS("/home/goldma34/fire_insect_co-occurence/data/results/fit_model_subgroup3_severity.RDS")
+  best_model_sev_3 <- readRDS("/home/goldma34/fire_insect_co-occurence/data/results/best_model_subgroup3_severity.RDS")
+  m.data.sev_3 <- match_data(best_model_sev_3)
+}
+
+# Run analysis with sample sizes from 20 to 300
+result <- min_detectable_effect_size(
+  fit.sev_3, 
+  m.data.sev_3,
+  sample_sizes = seq(20, 300, by = 10),
+  plot_filename = "/home/goldma34/fire_insect_co-occurence/plots/power_analysis/subgroup3_severity_mdes.png"
+)
+
+# Print the results
+print(result$plot_cohens_d)
+print(result$plot_raw)
+
+# Get minimum detectable effect size for a specific power level (e.g., 90%)
+higher_power_mdes <- min_detectable_effect_size(
+  fit.sev_3, 
+  m.data.sev_3,
+  power_target = 0.9
+)
+
+cat("\nWith 90% power, minimum detectable effect size (Cohen's d):", 
+    round(higher_power_mdes$min_detectable_d, 3), "\n")
+cat("With 90% power, minimum detectable effect size (raw units):", 
+    round(higher_power_mdes$min_detectable_raw, 3), "\n")
