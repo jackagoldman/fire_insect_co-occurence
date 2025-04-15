@@ -117,9 +117,9 @@ history_gt90 <- history_gt90 %>%
 
 #Splitting the data for subclass
 # keep non-defoliated options
-hist_gt90_1_2 <- subset(history_gt90, window_opp == "0" | window_opp == "1")
-hist_gt90_2_2  <- subset(history_gt90, window_opp == "0" | window_opp == "2")
-hist_gt90_3_2 <- subset(history_gt90, window_opp == "0" | window_opp == "3")
+hist_gt90_1_2 <- subset(history_gt90, window_opp_2 == "0" | window_opp_2 == "1")
+hist_gt90_2_2  <- subset(history_gt90, window_opp_2 == "0" | window_opp_2 == "2")
+hist_gt90_3_2 <- subset(history_gt90, window_opp_2 == "0" | window_opp_2 == "3")
 
 
 #####################################
